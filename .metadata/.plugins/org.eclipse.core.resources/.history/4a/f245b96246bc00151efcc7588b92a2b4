@@ -1,0 +1,23 @@
+$("#submit").click(function() {
+	var isValid = true;
+	isValid = validateImportantFields(isValid);
+	//Checking the dates included
+	if($("#startDate").data("DateTimePicker").getDate().isBefore(moment().hour(0).minutes(0).seconds(0))) {
+		addError("The Start Date should be greater than current time");
+		addErrorValidation($("#startDate"));
+		isValid = false;
+	}
+	if(!$("#startDate").data("DateTimePicker").getDate().isBefore($("#endDate").data("DateTimePicker").getDate())) {
+		addError("The End Date should be greater than Start Date ");
+		addErrorValidation($("#startDate"));
+		addErrorValidation($("#endDate"));
+		isValid = false;
+	}
+	if(isValid){
+		submitCampaign();
+	}
+});
+
+$("#campaign-reset").click(function(){
+	resetAll();
+});

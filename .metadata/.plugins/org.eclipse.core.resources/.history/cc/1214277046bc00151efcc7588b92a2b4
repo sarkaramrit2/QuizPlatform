@@ -1,0 +1,316 @@
+//AngularJs handling
+
+app.controller('refreshQulController', function($scope, ajaxService,
+		modalService) {
+	$scope.initializeController = function() {
+		$scope.refresh = {};
+		$scope.refresh.message = '';
+	};
+	$scope.refreshAll = function() {
+		var refreshObj = new Object();
+		ajaxService.AjaxGetWithData(refreshObj, "/admin/qulAdmin/refreshAll",
+				$scope.refreshAllSuccess, $scope.refreshAllError);
+	};
+
+	$scope.refreshAllSuccess = function(response) {
+		var items = response['items'];
+		if (items != null && items['success'] != null) {
+			$scope.refresh.message = items['success'];
+		} else {
+		}
+	};
+
+	$scope.refreshAllError = function(response) {
+	};
+});
+
+app
+		.controller(
+				'manageQulController',
+				function($scope, ngTableParams, $filter, $modal, ajaxService,
+						modalService) {
+					$scope.initializeController = function() {// alert("inside initialize
+						// controller");
+						$scope.query = {};
+						$scope.query.values = [];
+
+						$scope.columns = [];
+						$scope.editId = -1;
+						$scope.query.query = '';
+						$scope.disableFlag = false;
+						$scope.columns = [ {
+							title : 'Word',
+							field : 'word',
+							visible : true,
+							filter : {
+								word : 'text'
+							}
+						}, {
+							title : 'Score',
+							field : 'score',
+							visible : true,
+							filter : {
+								score : 'text'
+							},
+							type : 'number'
+						},
+
+						{
+							title : 'Context',
+							field : 'context',
+							visible : true,
+							filter : {
+								context : 'text'
+							}
+						}, {
+							title : 'Label',
+							field : 'label',
+							visible : true,
+							filter : {
+								label : 'text'
+							}
+						}
+
+						];
+
+					};
+
+					$scope.resetQuery = function() {
+						// enable submit button
+						$scope.disableFlag = false;
+						$scope.query.values = [];
+						$scope.tableParams.reload();
+						$scope.query = {};
+						$scope._query = angular.copy($scope.query);
+					};
+
+					$scope.indexQuery = function() {
+						var argument = "query=" + $scope.query.query + "&url="
+								+ $scope.url;
+						ajaxService.AjaxPostWithParam(argument,
+								"/admin/qulAdmin/cacheQuery",
+								$scope.indexQuerySuccess,
+								$scope.indexQueryError);
+					};
+
+					$scope.indexQuerySuccess = function() {/* nothing to do */
+					};
+					$scope.indexQueryError = function() {/* nothing to do */
+					};
+
+					$scope.submitQuery = function() {
+						// disable submit button
+						var queryObject = new Object();
+						$scope.disableFlag = true;
+						queryObject.query = $scope.query.query;
+						ajaxService.AjaxGetWithData(queryObject,
+								"/admin/qulAdmin/getValuesByQuery",
+								$scope.submitQuerySuccess,
+								$scope.submitQueryError);
+					};
+
+					$scope.submitQuerySuccess = function(response) {
+						var items = response['items'];
+						if (items != null && items['query'] != null) {
+							$scope.query = items['query'];
+							$scope._query = angular.copy($scope.query);
+							$scope.tableParams.sorting($scope.columns[0].field,
+									'asc');
+							$scope.tableParams.reload();
+						} else {
+							$scope.query.values = [];
+							$scope._query = angular.copy($scope.query);
+							$scope.tableParams.reload();
+
+						}
+					};
+
+					$scope.submitQueryError = function(response) {
+						// Nothing to do as no exception handling at server side
+					};
+
+					var getData = function() {
+						return $scope.query.values;
+					};
+
+					$scope.editQuery = function(index) {
+						$scope.editId = index;
+					};
+
+					$scope.updateQuery = function(row) {
+						if (row.context == undefined || row.context == null
+								|| row.context.toString().trim() == '') {
+							addError("Context required!");
+							return;
+						}
+						if (row.label == undefined || row.label == null
+								|| row.label.toString().trim() == '') {
+							addError("Label required!");
+							return;
+						}
+						if (row.word == undefined || row.word == null
+								|| row.word.toString().trim() == '') {
+							addError("Word required!");
+							return;
+						}
+						if (row.score == undefined || row.score == null
+								|| row.score.toString().trim() == '') {
+							addError("Score value required!");
+							return;
+						}
+						if (isNaN(row.score)) {
+							row.score = '';
+							addError("Not valid number!");
+							return;
+						}
+						$scope.editQuery(-1);// now update is going to happen
+						// successfully
+						ajaxService.AjaxPost($scope.query,
+								"/admin/qulAdmin/updateQuery",
+								$scope.updateQueryCompleted,
+								$scope.updateQueryError);
+					};
+
+					$scope.updateQueryError = function(response) {
+						angular.copy($scope._query, $scope.query);
+						$scope.tableParams.reload();
+					};
+
+					$scope.updateQueryCompleted = function(response) {
+						var items = response['items'];
+						if (items != null && items['query'] != null) {
+							$scope.query = items['query'];
+							$scope._query = angular.copy($scope.query);
+						} else {
+							angular.copy($scope._query, $scope.query);
+						}
+						$scope.tableParams.reload();
+					};
+
+					$scope.cancelQuery = function() {
+						angular.copy($scope._query, $scope.query);
+						$scope.tableParams.reload();
+					};
+
+					$scope.deleteQuery = function(row) {
+						var modalOptions = {
+							closeButtonText : 'Cancel',
+							actionButtonText : 'Delete',
+							headerText : 'Delete Query Combination',
+							bodyText : 'Are you sure you want to delete this query combination?'
+						};
+
+						modalService.showModal({}, modalOptions).then(
+								function(result) {
+									var index = $scope.query.values
+											.indexOf(row);// alert(index);
+									if (index >= 0) {
+										$scope.query.values.splice(index, 1);
+									}
+									ajaxService.AjaxPost($scope.query,
+											"/admin/qulAdmin/updateQuery",
+											$scope.deleteQueryCompleted,
+											$scope.deleteQueryError);
+								});
+
+					};
+
+					$scope.deleteQueryError = function(response) {
+						angular.copy($scope._query, $scope.query);
+						$scope.tableParams.reload();
+					};
+
+					$scope.deleteQueryCompleted = function(response) {
+						var items = response['items'];
+						if (items != null && items['query'] != null) {
+							$scope.query = items['query'];
+							$scope._query = angular.copy($scope.query);
+						} else {
+							angular.copy($scope._query, $scope.query);
+						}
+						$scope.tableParams.reload();
+					};
+
+					$scope.tableParams = new ngTableParams({
+						page : 1, // show first page
+						count : 10, // count per page
+					}, {
+						total : function() {
+							return getData().length;
+						}, // length of
+						// data
+						getData : function($defer, params) {
+							var filteredData = params.filter() ? $filter(
+									'filter')(getData(), params.filter())
+									: getData();
+							var orderedData = params.sorting() ? $filter(
+									'orderBy')(filteredData, params.orderBy())
+									: filteredData;
+
+							params.total(orderedData.length); // set total for recalc
+							// pagination
+
+							$defer.resolve(orderedData.slice(
+									(params.page() - 1) * params.count(),
+									params.page() * params.count()));
+						},
+					});
+					$scope.tableParams.settings().$scope = $scope;
+
+					// Add modal
+
+					$scope.openAddQueryModal = function(size) {
+						var modalInstance = $modal.open({
+							templateUrl : 'addQuery.html',
+							controller : addQueryController,
+							size : size,
+							resolve : {
+								query : function() {
+									return $scope.query;
+								}
+							}
+						});
+						modalInstance.result.then(function(response) {
+							var items = response['items'];
+							if (items != null && items['query'] != null) {
+								$scope.query = items['query'];
+								$scope._query = angular.copy($scope.query);
+							} else {
+								angular.copy($scope._query, $scope.query);
+							}
+							$scope.tableParams.reload();
+						}, function() {
+							// $log.info('Modal dismissed at: ' + new Date());
+						});
+					};
+
+					var addQueryController = function($scope, $modalInstance,
+							ajaxService, query) {
+						$scope.query = query;
+						$scope.innerQuery = {
+							context : '',
+							label : '',
+							word : '',
+							score : ''
+						};
+						$scope.addQuery = function() {
+							$scope.query.values.push($scope.innerQuery);
+							ajaxService.AjaxPost($scope.query,
+									"/admin/qulAdmin/updateQuery",
+									$scope.addQueryCompleted,
+									$scope.addQueryError);
+						};
+
+						$scope.addQueryCompleted = function(response) {
+							$modalInstance.close(response);
+						};
+
+						$scope.addQueryError = function(response) {
+							$modalInstance.close(response);
+						};
+
+						$scope.closeAddQueryModal = function() {
+							$modalInstance.dismiss('cancel');
+						};
+					};
+				});

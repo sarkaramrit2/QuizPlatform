@@ -1,0 +1,412 @@
+/* Js Functions of suggestor admins 
+ */
+
+function addError(message) {
+	$("#message")
+			.html(
+					'<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Error!</h4>'
+							+ message + '</div>');
+}
+
+function addMessage(message) {
+	$("#message")
+			.html(
+					'<div class="alert alert-info alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Info:</h4>'
+							+ message + '</div>');
+}
+
+function addSuccessMessage(message) {
+	$("#message")
+			.html(
+					'<div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Success!</h4>'
+							+ message + '</div>');
+}
+
+function removeMessage() {
+	$("#message").html('');
+}
+
+function indexSuggestion(keyword, category, count, priority) {
+	var ajaxUrl = "/admin/suggestor/indexSuggestion?keyword="
+			+ encodeURIComponent(keyword) + "&category=" + category + "&count="
+			+ count + "&priority=" + priority;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "GET",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+function indexSuggestionOnBucket(keyword, bucket, bLogParseScore, bBeaconScore, bRuleCatalogScore, bCatalogScore, bTitleScore) {
+	var ajaxUrl = "/admin/suggestor/indexSuggestionOnBucket?keyword="
+			+ encodeURIComponent(keyword) + "&bucket=" + encodeURIComponent(bucket)
+			+ "&logParseScore=" + bLogParseScore + "&beaconScore=" + bBeaconScore + "&ruleCatalogScore=" + bRuleCatalogScore + "&catalogScore=" + bCatalogScore + "&titleScore=" + bTitleScore;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "GET",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function printListOfPrevSuggestions(obj){
+	var htmlData = "<h4>List Of Previous Suggestions</h4><br /><ul>";
+    for(var data in obj){
+        if(typeof obj[data]=='object'){
+        	printListOfPrevSuggestions(obj[data]);
+        }else{
+        	htmlData += "<li>" + obj[data] + "</li>";
+        }
+    }
+    htmlData += "</ul>";
+    $("#list-previous-suggestions").html(htmlData); // TODO: display list of suggestions and make matched suggestions as bold
+}
+
+function deleteSuggestion(keyword) {
+	var ajaxUrl = "/admin/suggestor/deleteSuggestion?keyword=" + encodeURIComponent(keyword);
+	
+	$("#message").html('<div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Processing!</h4>Uploading file..</div>');
+	$.ajax({
+		url : ajaxUrl,
+		type : "GET",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				removeMessage();
+				addSuccessMessage(msg);
+//				printListOfPrevSuggestions(data['items']);
+			} else {
+				removeMessage();
+				addError(msg);
+			}
+		}
+	});
+}
+function createSuggestionDetailsTable(items) {
+	$("#suggestionDetails_wrapper").hide();
+	if (items != null && items.length > 0) {
+		html = "<thead><tr><th>S. No.</th><th>Suggestion</th><th>Categories</th></tr></thead><tbody>";
+		var itr = 1;
+		for ( var i = 0, size = items.length; i < size; i++) {
+			var m = items[i];
+			html += "<tr><td>" + itr + "</td><td>" + m.keyword + "</td><td>"
+					+ m.categorys + "</td></tr>"
+			itr++;
+		}
+		html += "</tbody>";
+		$("#suggestionDetailsTable").html(html);
+		$("#suggestionDetails_wrapper").show();
+	}
+}
+function suggestionDetails(keyword) {
+	var ajaxUrl = "/admin/suggestor/suggestionDetails?keyword="
+			+ encodeURIComponent(keyword);
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "GET",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			var items = data['items'];
+			if (status == "success") {
+				var suggestions = items['suggestions'];
+				addSuccessMessage(msg);
+				createSuggestionDetailsTable(suggestions);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function editSC(id) {
+	var elementName = "#displayName-" + id;
+	var elementLimit = "#wordLimit-" + id;
+	var elementSubmit = "#edit-sc-submit-" + id;
+	var elementEdit = "#edit-sc-update-" + id;
+	$(elementName).removeAttr('disabled');
+	$(elementLimit).removeAttr('disabled');
+	$(elementSubmit).removeAttr('hidden');
+	$(elementEdit).attr('hidden', 'true');
+}
+
+function submitSC(id) {
+	var elementId = "#categoryId-" + id;
+	var elementName = "#displayName-" + id;
+	var elementLimit = "#wordLimit-" + id;
+	var elementSubmit = "#edit-sc-submit-" + id;
+	var elementEdit = "#edit-sc-update-" + id;
+	$(elementName).attr('disabled', 'true');
+	$(elementLimit).attr('disabled', 'true');
+	$(elementEdit).removeAttr('hidden');
+	$(elementSubmit).attr('hidden', 'true');
+
+	var ajaxUrl = "/admin/suggestor/suggestionCategory/update?id="
+			+ encodeURIComponent($(elementId).val()) + "&name="
+			+ encodeURIComponent($(elementName).val()) + "&limit="
+			+ encodeURIComponent($(elementLimit).val());
+	$.ajax({
+		url : ajaxUrl,
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+$("#add-sc-button")
+		.click(
+				function() {
+
+					var id = false;
+
+					if ($('#categoryId').val() == '') {
+						id = false;
+						$('#categoryIdError')
+								.html(
+										'<i class="icon-chevron-left"></i> Please Select Category!');
+						errorValidation($('#inputCategory'));
+					} else {
+						id = true;
+						successValidation($('#inputCategory'));
+						$('#categoryIdError').html('');
+					}
+
+					if (validationSCForm()) {
+						var id = $('#categoryId').attr('value');
+						var name = $('#displayName').attr('value');
+						var limit = $('#wordLimit').attr('value');
+						if (name == '') {
+							$('#displayNameError')
+									.html(
+											'<i class="icon-chevron-left"></i> Please enter display name!');
+							errorValidation($('#inputDisplayName'));
+						} else if (limit == '') {
+							$('#wordLimitError')
+									.html(
+											'<i class="icon-chevron-left"></i> Please enter word limit!');
+							errorValidation($('#inputWordLimit'));
+						} else {
+							successValidation($('#inputDisplayName'));
+							successValidation($('#inputWordLimit'));
+							$('#displayNameError').html('');
+							$('#wordLimitError').html('');
+							addSC(id, name, limit);
+						}
+					} else {
+						$("#error").html("<div>'Category is mandatory!'</div>");
+						return id && name && limit;
+					}
+				});
+
+function addSC(id, name, limit) {
+	var ajaxUrl = "/admin/suggestor/suggestionCategory/add?id="
+			+ encodeURIComponent(id) + "&name=" + encodeURIComponent(name)
+			+ "&limit=" + encodeURIComponent(limit);
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function removeSC(id) {
+	alert("Are you sure?");
+	var ajaxUrl = "/admin/suggestor/suggestionCategory/remove?id="
+			+ encodeURIComponent(id);
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function validationSCForm() {
+	if ($('#categoryId').val() == '') {
+		return false;
+	}
+	return true;
+}
+
+function editSB(id) {
+	var elementName = "#bdisplayName-" + id;
+	var elementLimit = "#bwordLimit-" + id;
+	var elementSubmit = "#edit-sb-submit-" + id;
+	var elementEdit = "#edit-sb-update-" + id;
+	$(elementName).removeAttr('disabled');
+	$(elementLimit).removeAttr('disabled');
+	$(elementSubmit).removeAttr('hidden');
+	$(elementEdit).attr('hidden', 'true');
+}
+
+function submitSB(id) {
+	var elementUrl = "#burl-" + id;
+	var elementName = "#bdisplayName-" + id;
+	var elementLimit = "#bwordLimit-" + id;
+	var elementSubmit = "#edit-sb-submit-" + id;
+	var elementEdit = "#edit-sb-update-" + id;
+	$(elementName).attr('disabled', 'true');
+	$(elementLimit).attr('disabled', 'true');
+	$(elementEdit).removeAttr('hidden');
+	$(elementSubmit).attr('hidden', 'true');
+
+	var ajaxUrl = "/admin/suggestor/suggestionBucket/update?url="
+			+ encodeURIComponent($(elementUrl).val()) + "&name="
+			+ encodeURIComponent($(elementName).val()) + "&limit="
+			+ encodeURIComponent($(elementLimit).val());
+	$.ajax({
+		url : ajaxUrl,
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+$("#add-sb-button")
+		.click(
+				function() {
+
+					var url = false;
+
+					if ($('#burl').val() == '') {
+						url = false;
+						$('#bucketError')
+								.html(
+										'<i class="icon-chevron-left"></i> Please Select Bucket!');
+						errorValidation($('#inputBucket'));
+					} else {
+						id = true;
+						successValidation($('#inputBucket'));
+						$('#bucketError').html('');
+					}
+
+					if (validationSBForm()) {
+						var url = $('#burl').attr('value');
+						var name = $('#bdisplayName').attr('value');
+						var limit = $('#bwordLimit').attr('value');
+						if (name == '') {
+							$('#bdisplayNameError')
+									.html(
+											'<i class="icon-chevron-left"></i> Please enter display name!');
+							errorValidation($('#binputDisplayName'));
+						} else if (limit == '') {
+							$('#bwordLimitError')
+									.html(
+											'<i class="icon-chevron-left"></i> Please enter word limit!');
+							errorValidation($('#binputWordLimit'));
+						} else {
+							successValidation($('#binputDisplayName'));
+							successValidation($('#binputWordLimit'));
+							$('#bdisplayNameError').html('');
+							$('#bwordLimitError').html('');
+							addSB(url, name, limit);
+						}
+					} else {
+						$("#error").html("<div>'Bucket is mandatory!'</div>");
+						return url && name && limit;
+					}
+				});
+
+function addSB(url, name, limit) {
+	var ajaxUrl = "/admin/suggestor/suggestionBucket/add?url="
+			+ encodeURIComponent(url) + "&name=" + encodeURIComponent(name)
+			+ "&limit=" + encodeURIComponent(limit);
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function removeSB(url) {
+	alert("Are you sure?");
+	var ajaxUrl = "/admin/suggestor/suggestionBucket/remove?url="
+			+ encodeURIComponent(url);
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function validationSBForm() {
+	if ($('#burl').val() == '') {
+		return false;
+	}
+	return true;
+}

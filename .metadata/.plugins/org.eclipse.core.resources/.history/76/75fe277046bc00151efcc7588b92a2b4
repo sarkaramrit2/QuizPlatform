@@ -1,0 +1,10 @@
+<!-- Need to include bootstrap datepicker js to use this -->
+<div class="form-group">
+	<label class="control-label ${param['labelSize']}" for="${param['id']}">${param['text']}</label>
+	<div class="input-group date datetimepicker ${param['size']}">
+		<input type="text" class="form-control ${param['inputClass']}" id="${param['id']}"
+			/> <span class="input-group-addon"><span
+			class="glyphicon glyphicon-calendar"></span>
+		</span>
+	</div>
+</div>

@@ -1,0 +1,86 @@
+<c:if test="${not empty suggestionBuckets}">
+	<table cellpadding="0" cellspacing="0" border="0"
+		class="display dataTable" id="nodeTable">
+		<thead>
+			<tr>
+				<th>S. No.</th>
+				<th>Url</th>
+				<th>Name</th>
+				<th>Display Name</th>
+				<th>Word Limit</th>
+				<th>Action</th>
+				<th>Remove</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<c:forEach items="${suggestionBuckets}" var="sb" varStatus="ctr">
+				<tr>
+					<td>${ctr.index + 1}</td>
+					<td><input id="burl-${ctr.index}" type="text"
+						style="width: 200px" value="${sb.url}" disabled />
+					<td><input id="bcategoryName-${ctr.index}" type="text" style=""
+						"width: 200px" value="${cache.getCacheByName('productCategoryCache').getLabelForLabelPath(cache.getCacheByName('productCategoryCache').getLabelForUrl(sb.url)).name}"
+						disabled />
+					<td><input id="bdisplayName-${ctr.index}" type="text"
+						style="width: 450px" value="${sb.displayName}" disabled />
+					<td><input id="bwordLimit-${ctr.index}" type="text"
+						style="width: 50px" value="${sb.wordLimit}" disabled />
+					<td><input type="button" value="Edit"
+						id="edit-sb-update-${ctr.index}" onclick="editSB(${ctr.index})">
+						<input type="button" value="Submit" hidden
+						id="edit-sb-submit-${ctr.index}" onclick="submitSB(${ctr.index})">
+					</td>
+					<td><input type="button" value="Remove"
+						onclick="removeSB(${sb.url})">
+					</td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+</c:if>
+
+<form class="form-horizontal" role="form">
+	<div class="form-group info" style="background: none" id="inputBucket">
+		<label class="control-label col-lg-2" for="burl">Bucket<span
+			class="required">*</span> </label>
+		<div class="col-lg-3">
+			<select id="burl" class="form-control">
+				<option value="">----- select bucket -----</option>
+				<c:forEach items="${buckets}" var="bucket">
+					<option value="${bucket.url}" />${bucket.name}</option>
+				</c:forEach>
+			</select> <span id="bucketError" class="help-inline"></span>
+		</div>
+	</div>
+
+	<div class="form-group info" style="background: none"
+		id="binputDisplayName">
+		<label class="control-label col-lg-2" for="bdisplayName">Display
+			Name</label>
+		<div class="col-lg-3">
+			<input type="text" class="form-control" id="bdisplayName"> <span
+				id="bdisplayNameError" class="help-inline"></span>
+		</div>
+	</div>
+
+	<div class="form-group info" style="background: none"
+		id="binputWordLimit">
+		<label class="control-label col-lg-2" for="bwordLimit">Word
+			Limit</label>
+		<div class="col-lg-3">
+			<input type="text" class="form-control" id="bwordLimit"> <span
+				id="bwordLimitError" class="help-inline"></span>
+		</div>
+	</div>
+	<div class="form-group">
+
+		<div class="col-lg-3 col-lg-offset-2" style="float: left;">
+			<input type="button" value="Submit" class="btn btn-primary btn-lg"
+				id="add-sb-button" />
+		</div>
+	</div>
+
+	<br> <br>
+
+</form>

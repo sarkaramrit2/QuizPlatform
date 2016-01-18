@@ -1,0 +1,155 @@
+$("#replicate-button").click(function() {
+	var masterSolr = $('#masterSolr option:selected').attr('value');
+	var newMasterSolr = $('#newMasterSolr option:selected').attr('value');
+
+	if (masterSolr == 0 || newMasterSolr == 0) {
+		addError("Please select the masters appropriately...");
+	} else {
+		replicate(masterSolr, newMasterSolr);
+	}
+});
+
+$("#disable-replicate-button").click(function() {
+	var masterSolr = $('#dmasterSolr option:selected').attr('value');
+	var newMasterSolr = $('#dnewMasterSolr option:selected').attr('value');
+
+	if (masterSolr == 0 || newMasterSolr == 0) {
+		addError("Please select the masters appropriately...");
+	} else {
+		replication(true, masterSolr, newMasterSolr);
+	}
+});
+
+$("#enable-replicate-button").click(function() {
+	var masterSolr = $('#emasterSolr option:selected').attr('value');
+	var newMasterSolr = $('#enewMasterSolr option:selected').attr('value');
+
+	if (masterSolr == 0 || newMasterSolr == 0) {
+		addError("Please select the masters appropriately...");
+	} else {
+		replication(false, masterSolr, newMasterSolr);
+	}
+});
+
+$("#move-button").click(function() {
+	var masterSolr = $('#mmasterSolr option:selected').attr('value');
+	var newMasterSolr = $('#mnewMasterSolr option:selected').attr('value');
+	if ($('#mproductcategory').is(':hidden')) {
+		var categoryId = $('#mdealcategory').attr('value');
+	} else {
+		var categoryId = $('#mproductcategory').attr('value');
+	}
+	if (masterSolr == 0 || newMasterSolr == 0 || masterSolr == newMasterSolr) {
+		addError("Please select the masters appropriately...");
+	} else {
+		move(categoryId, masterSolr, newMasterSolr);
+	}
+});
+
+function showAllCategoriesByNodeId() {
+	var id = $('#mmasterSolr option:selected').attr('value');
+	if (id == 0) {
+		addError('Please Select a valid category...');
+		return false;
+	}
+	var ajaxUrl = "/admin/search/allCategoryIdsByNodeId?nodeId=" + id;
+	$
+			.ajax({
+				url : ajaxUrl,
+				type : "POST",
+				dataType : 'json',
+				success : function(data) {
+					if (data.categoryNameDTOs.length > 0) {
+						if (data.vertical == 'p') {
+							$('#mdealCategoryId').attr('hidden', 'true');
+							$('#mproductCategoryId').removeAttr('hidden');
+							html = '<option value="0">Please select Product Category</option>';
+							for ( var i = 0; i < (data.categoryNameDTOs.length); i++) {
+								html += '<option value="'
+										+ data.categoryNameDTOs[i].id + '">'
+										+ data.categoryNameDTOs[i].name
+										+ '</option>';
+							}
+
+							$('#mproductcategory').html(html);
+						} else {
+							$('#mproductCategoryId').attr('hidden', 'true');
+							$('#mdealCategoryId').removeAttr('hidden');
+							html = '<option value="0">Please select Deal Category</option>';
+							for ( var i = 0; i < (data.categoryNameDTOs.length); i++) {
+								html += '<option value="'
+										+ data.categoryNameDTOs[i].id + '">'
+										+ data.categoryNameDTOs[i].name
+										+ '</option>';
+							}
+							$('#mdealcategory').html(html);
+						}
+					} else {
+						addError("Empty categories List:");
+					}
+				}
+			});
+}
+
+function move(categoryId, masterSolr, newMasterSolr) {
+	var ajaxUrl = "/admin/shiftCategory/move?masterNode=" + masterSolr
+			+ "&newMasterNode=" + newMasterSolr + "&categoryId=" + categoryId;
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function replicate(masterSolr, newMasterSolr) {
+	var ajaxUrl = "/admin/shiftCategory/replicate?masterNode=" + masterSolr
+			+ "&newMasterNode=" + newMasterSolr;
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function replication(disable, masterSolr, newMasterSolr) {
+	var ajaxUrl = "/admin/shiftCategory/replication?masterNode=" + masterSolr
+			+ "&newMasterNode=" + newMasterSolr;
+	if (disable) {
+		ajaxUrl += "&command=DISABLE";
+	} else if (!disable) {
+		ajaxUrl += "&command=ENABLE";
+	}
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}

@@ -1,0 +1,219 @@
+function addCategoryIdToNodeId(nodeId, categoryId) {
+
+	var value = $("#delete-category-button-" + categoryId).val();
+	if (value != "Delete") {
+
+		var ajaxUrl = "/admin/shardResolver/addCategoryId?categoryId="
+				+ categoryId + "&nodeId=" + nodeId;
+
+		$.ajax({
+			url : ajaxUrl,
+			type : "POST",
+			dataType : 'json',
+			success : function(data) {
+				var status = data['status'];
+				var msg = data['message'];
+				if (status == "success") {
+					addSuccessMessage(msg);
+					viewAllCategoryIdsByNodeId();
+				} else {
+					addError(msg);
+				}
+			}
+		});
+	} else {
+		addError("The categoryId is already added list:");
+	}
+}
+
+function addLabelToNodeId(nodeId, labelPath) {
+
+	var ajaxUrl = "/admin/shardResolver/addBucket?bucketId=" + labelPath
+			+ "&nodeId=" + nodeId;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			var items = data['items'];
+			if (status == "success") {
+				if (msg != "")
+					addSuccessMessage(msg);
+				fetchLabelDetails(labelPath);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+function deleteLabelToNodeId(nodeId, labelPath) {
+
+	var ajaxUrl = "/admin/shardResolver/deleteBucket?bucketId=" + labelPath
+			+ "&nodeId=" + nodeId;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			var items = data['items'];
+			if (status == "success") {
+				if (msg != "")
+					addSuccessMessage(msg);
+				fetchLabelDetails(labelPath);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+function createLabelDetailsTable(items) {
+	$("#labelDetailsTable_wrapper").hide();
+	if (items != null && items.length > 0) {
+		html = "<thead><tr><th>S. No.</th><th>Url</th><th>Shard</th><th>SearchId</th><th>Enabled</th><th>Email</th></tr></thead><tbody>";
+		var itr = 1;
+		for ( var i = 0, size = items.length; i < size; i++) {
+			var m = items[i];
+			html += "<tr><td>" + itr + "</td><td>" + m.label + "</td><td>"
+					+ m.node + "</td><td>" + m.searchId + "</td><td>"
+					+ m.enabled + "</td><td>" + m.updatedBy + "</td></tr>"
+			itr++;
+		}
+		html += "</tbody>";
+		$("#labelDetailsTable").html(html);
+		$("#labelDetailsTable_wrapper").show();
+	}
+}
+function fetchLabelDetails(labelPath) {
+
+	var ajaxUrl = "/admin/shardResolver/fetchBucketDetails?bucketId="
+			+ labelPath;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			var items = data['items'];
+			var labels = items['labelDTOs'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+				createLabelDetailsTable(labels);
+				$("#node-list").show();
+				$("#select-node-list").show();
+				$("#add-label").show();
+				$("#delete-label").show();
+				$("#add-all-buckets").hide();
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function viewAllCategoryIdsByNodeId() {
+	var id = $('#view-categories option:selected').attr('value');
+	if (id == 0) {
+		addError('Please Select a valid category:');
+		return false;
+	}
+	var ajaxUrl = "/admin/shardResolver/allCategoryIdsByNodeId?nodeId=" + id;
+	$
+			.ajax({
+				url : ajaxUrl,
+				type : "POST",
+				dataType : 'json',
+				success : function(data) {
+					$('#categoriesTable').dataTable().fnClearTable();
+					if (data.categoryNameDTOs != null) {
+						if (data.categoryNameDTOs.length > 0) {
+							for ( var i = 0; i < (data.categoryNameDTOs.length); i++) {
+
+								$('#categoriesTable')
+										.dataTable()
+										.fnAddData(
+												[
+														(i + 1),
+														data.categoryNameDTOs[i].id,
+														data.categoryNameDTOs[i].name,
+														'<input class="btn btn-primary" type="button" value="Delete" id="delete-category-button-'
+																+ data.categoryNameDTOs[i].id
+																+ '" onclick="deleteCategoryFromNode('
+																+ data.categoryNameDTOs[i].id
+																+ ','
+																+ id
+																+ ');">' ]);
+
+							}
+
+							$('#productCategoryId').removeAttr('hidden');
+							html = '<option value="0">Please select Product Category</option>';
+							for ( var i = 0; i < (data.remainingCategories.length); i++) {
+								html += '<option value="'
+										+ data.remainingCategories[i].id + '">'
+										+ data.remainingCategories[i].name
+										+ '</option>';
+							}
+
+							$('#productcategory').html(html);
+
+						}
+					} else {
+
+						getAllProductCategories();
+
+					}
+				}
+			});
+}
+function getAllProductCategories() {
+	var ajaxUrl = "/admin/shardResolver/getAllProductCategories";
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			$('#productCategoryId').removeAttr('hidden');
+			html = '<option value="0">Please select Product Category</option>';
+			for ( var i = 0; i < data.length; i++) {
+				html += "<option value='" + data[i].id + "'>" + data[i].name
+						+ "</option>";
+			}
+			$('#productcategory').html(html);
+
+		}
+	});
+}
+function deleteCategoryFromNode(categoryId, id) {
+	var elementId = "#id-" + categoryId;
+	var elementName = "#name-" + categoryId;
+	var elementSubmit = "#delete-category-submit-" + id;
+
+	$(elementSubmit).attr('hidden', 'true');
+
+	var ajaxUrl = "/admin/shardResolver/deleteCategoryFromNode?nodeId=" + id
+			+ "&categoryId=" + categoryId;
+	$.ajax({
+		url : ajaxUrl,
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+				viewAllCategoryIdsByNodeId();
+			} else {
+				addError(msg);
+			}
+
+		}
+	});
+
+}

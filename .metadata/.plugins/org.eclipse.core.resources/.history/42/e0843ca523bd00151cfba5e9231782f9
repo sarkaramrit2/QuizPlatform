@@ -1,0 +1,24 @@
+package com.quiz.indexer.questions.impl;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
+
+import com.quiz.core.dto.QuestionDTO;
+import com.quiz.indexer.questions.IQuestionSolrIndexer;
+
+
+@SuppressWarnings({ "deprecation" })
+public class QuestionSolrIndexerImpl implements IQuestionSolrIndexer{
+	
+	private static final  String APP_JSON = "application/json";
+
+	@SuppressWarnings("resource")
+	public int indexQuesInSolr(List<QuestionDTO> questions){
+		
+		
+		return 0;
+	}
+	
+}

@@ -1,0 +1,13 @@
+package com.quiz.utils;
+
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+
+import com.quiz.enums.SystemProperty;
+
+@SuppressWarnings("deprecation")
+public class SolrPostRequest {
+	
+	public static HttpSolrServer getSolrServer(SystemProperty property){
+		return new HttpSolrServer(property.getPropertyValue());
+	}
+}

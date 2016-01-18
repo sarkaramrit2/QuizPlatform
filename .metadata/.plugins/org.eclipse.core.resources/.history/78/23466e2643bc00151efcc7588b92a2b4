@@ -1,0 +1,88 @@
+<%@ include file="/tld_includes.jsp"%>
+<div class="submit-button-container">
+	<button class="btn btn-primary" data-toggle="modal"
+		data-target="#upload">Upload Products</button>
+</div>
+<div class="submit-button-container">
+	<button class="btn btn-medium btn-primary" data-toggle="modal"
+		align="right" data-target="#instructions">Special
+		Instructions</button>
+
+
+	<div id="instructions" class="modal fade" tabindex="-1" role="dialog"
+		aria-labelledby="instructionsId" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">×</button>
+					<h3 id="instructionsId">Special Instructions</h3>
+				</div>
+				<div class="modal-body">
+				<form id="uploadInstruction">
+				<div class="form-group">
+					<ol>
+						<li>If there is any blank row, system will ignore all the
+							pogs after the blank row</li>
+						<li>This is only applicable for products</li>
+						<li>Only files with extension *.xls will be uploaded</li>
+						<li>These products should be listed on top when sorting is
+							based on best sellers / popularity (configurable)</li>
+					</ol>
+				</div>
+				</form>					
+				</div>
+				<div class="modal-footer">
+					<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="upload" class="modal fade" tabindex="-1" role="dialog"
+	aria-labelledby="uploadLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header" id="modelHeaderId">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h4 id="uploadLabel" class="modal-title">Upload .xls Sheet</h4>
+			</div>
+
+			<div class="modal-body" id="modelId">
+				<form id="uploadForm" method="post"
+					action="${path.http}/admin/landingPage/campaignAdmin/upload"
+					enctype="multipart/form-data">
+					<div id="imageContent">
+						<jsp:include page="../bootstrap/fileUploader.jsp">
+							<jsp:param value="fileUpload" name="id" />
+						</jsp:include>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer" id="modelFooterId">
+				<button class="btn" data-dismiss="modal" type="submit"
+					aria-hidden="true">Close</button>
+				<button class="btn btn-primary" id="uploadButton">Upload</button>
+			</div>
+			<div id="loaderDiv" style="padding: 14px 15px 15px; display: none">
+				<div class="progress progress-striped active">
+				 	<div class="progress-bar " role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+				 		Uploading File
+  					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="submit-button-container">
+	<p>
+		<a class="btn btn-medium btn-primary"
+			href="${path.http}/static/CampaignSample.xls" align="right"><i
+			class="icon-arrow-down icon-white"></i>Download Sample .xls sheet</a>
+	</p>
+</div>

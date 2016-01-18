@@ -1,0 +1,440 @@
+//Updates the categoryIds
+var categoryId = "";
+var categoryUrl = "";
+var searchId = "";
+var filters = "";
+var queryId = "";
+$("#load-more").hide();
+$("#loaderDiv").hide();
+
+/*function addRange() {
+	$(".rangeFilter").focusout(function() {
+		var flag = false;
+		var filterName = $(this).attr("filterName");
+		var filterRangeEnd = $("#filterRangeEnd-" + filterName).val();
+		var filterRangeStart = $("#filterRangeStart-" + filterName).val();
+		var filterRangeEndDefault = $("#filterRangeEnd-" + filterName).attr("default");
+		var filterRangeStartDefault = $("#filterRangeStart-" + filterName).attr("default");
+		if(isNumeric($(this).val()) && parseFloat(filterRangeEnd) > parseFloat(filterRangeStart)) {
+			$("#filter-" + filterName).addClass("rangeSelected");
+			flag = true;
+			$("#filterRangeEnd-" + filterName).attr("default",filterRangeEnd);
+			$("#filterRangeStart-" + filterName).attr("default",filterRangeStart);
+			updateFilters();
+		} 
+		if(!flag){
+			addError("Invalid Range Field values for filter" + $(this).parent().val());
+			$("#filterRangeStart-" + filterName).val(filterRangeStartDefault);
+			$("#filterRangeEnd-" + filterName).val(filterRangeEndDefault);
+		}
+	});
+}*/
+
+
+function addCategory(category, update) {
+	if($("#selectedCategories").html() == undefined || $("#selectedCategories").html() == "") {
+		categoryId = category.id;
+		categoryUrl = category.url;
+		searchId = category.searchId;
+		/*$('#selectedCategories').append('<div id="category-' + category.id + '" categoryUrl="' + category.url + '" searchId="' + category.searchId + '" class="form-group categorySelect"><h3><span class="label label-primary">' + category.name + 
+				'</span><br/><br/><span class="label label-primary">('
+				+ category.url +')</span><button type="button" class="close" aria-hidden="true" onclick=removeCategory("' + category.id + '")>&times;</button></h3></div>');
+		*/
+		setFilters();
+		/*if(update) {
+			updateFilters();
+		}*/
+	}
+}
+
+/*function addRangeFilter(filter) {
+	if($("#filter-" + filter.filterName).html() == undefined && filter.rangeStart != filter.rangeEnd) {
+		$('#selectedRangeFilters').append('<div id="filter-' + filter.filterName + '" class="rangeFilterSelect form-group" filterName="' + filter.filterName + '"><div class="col-lg-2"><label class="control-label">' 
+				+ filter.name + '</label></div><div class="col-lg-4"><input class="form-control rangeFilter" filterName="'+ filter.filterName +'" id="filterRangeStart-' + filter.filterName +
+				'" type="text" value="' +  filter.rangeStart + '" default="' + filter.rangeStart  + '"/></div> <div class="col-lg-1"><label class="control-label">TO</label></div>' + 
+				'<div class="col-lg-4 col-lg-offset-1"><input class="form-control rangeFilter" filterName="'+ filter.filterName +'" id="filterRangeEnd-' + filter.filterName + 
+				'" value="' + filter.rangeEnd + '" default="' + filter.rangeEnd + '" type="text" /></div></div>' );
+		addRange();
+	}
+	
+}*/
+
+/*function addFilter(filter, update) {
+	if($("#filter-" + filter.filterName).html() == undefined) {
+		$('#selectedFilters').append('<div class="form-group"><div id="filter-' + filter.filterName + '" class="filterSelect col-lg-offset-1" filterName="' + filter.filterName + '"><h4><span class="label label-default">' 
+				+ filter.name + '</span><button type="button" class="close" aria-hidden="true" onclick=removeFilter("' + filter.filterName + 
+				'")>&times;</button></h4></div></div>');
+		$('#filter-' + filter.filterName).append('<div id="filterValue-' + filter.filterName + '" class="col-lg-11 col-lg-offset-1"></div>');
+		addFilterValue(filter, update);
+	} else {
+		addFilterValue(filter, update);
+	}
+}*/
+
+/*function addFilterValue(filter, update) {
+	if(!ifFilterValueExists(filter)) {
+		$("#filterValue-" + filter.filterName).append('<div class="filterValueSelect"><label class="filterValueLabel-' + filter.filterName + '">' + filter.value + 
+			'</label><button type="button" class="close" aria-hidden="true" onclick=removeFilterValue("' + filter.filterName + '","'+ encodeURIComponent(filter.value) + '")>&times;</button></div>');
+		if(update) {
+			updateFilters(filter);
+		}
+	}
+}*/
+
+function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/*function updateFilters() {
+	filters = "";
+	var filtersAdded = new Array();
+	$(".filterSelect").each(function() {
+		var filter = "";
+		var filterName = $(this).attr("filterName"); 
+		var i = 0;
+		filter = String.concat(filter,filterName,":");
+		$(".filterValueLabel-" + filterName).each(function() {
+			filter = String.concat(filter,$(this).html(),"^");
+		});
+		if(filter.indexOf("^") != -1) {
+			filter = filter.substring(0, filter.length - 1);
+			if(filters.indexOf(filter) == -1) {
+				filters = String.concat(filters,filter,"|");
+			}
+		} 
+	});
+	$(".rangeSelected").each(function() {
+		var filter = "";
+		var filterName = $(this).attr("filterName");
+		filter = String.concat(filter,filterName,":");
+		var filterRangeEnd = $("#filterRangeEnd-" + filterName).val();
+		var filterRangeStart = $("#filterRangeStart-" + filterName).val();
+		filter = String.concat(filter,filterRangeStart,", ",filterRangeEnd);
+		filters = String.concat(filters,filter,"|");
+	});
+	if(filters.indexOf("|") != -1) {
+		filters = filters.substring(0, filters.length - 1);
+	}
+	encodeURIComponent(filters);
+	$("#products").html("");
+//	getPOGData(0,rowSize);
+}*/
+
+/*function getPOGData(start, rows) {
+	var ajaxUrl = '/admin/landingPage/getCampaignProductsForQuery?categoryUrl=' + categoryUrl + '&categoryId=' + categoryId + '&q=' + filters + '&start=' + start + '&rows=' + rows;
+	$.ajax({url:ajaxUrl, type: "GET", dataType: 'json', success: function(data) {
+		setCampaignPogs(data, start, rows);
+	}});
+}*/
+
+function createFilterQ(){
+	var filterQ ="";
+	var trs = $('.filter-table').children().find('tr');
+	for(var i=0;i<trs.length;i++) {
+		
+		var tds = $($(trs)[i]).find('td');
+		var fName = $($(tds)[0]).text().trim();
+		
+		var allF = "";
+		for(var k=1;k<tds.length;k++) {
+			var fVal = $($(tds)[k]).text().trim();
+			if(allF == null || allF == ""){
+				allF = fVal;
+			}else{
+				allF = allF + "^" + fVal.trim();
+			}
+			
+		}
+		if(tds.length > 1){
+			if(filterQ == null || filterQ == ""){
+				filterQ = fName + ":" + allF.trim();
+			}else{
+				if(allF.length > 0){}
+				filterQ = filterQ + "|" + fName + ":" + allF.trim();
+			}
+		}
+	}
+	return filterQ;
+}
+
+function submitQuery(){
+	var name = $("#queryName").val();
+	var inputUrl = encodeURIComponent($('#filters-url').val())
+	var filterQ = createFilterQ();
+
+	if(categoryUrl != null){
+		var ajaxUrl = '/admin/landingPage/submitQuery?categoryUrl=' + categoryUrl + '&categoryId=' + "" + '&searchId=' + searchId + '&q=' + encodeURIComponent(filterQ) + '&queryId=' + queryId + '&name=' + name + '&inputUrl=' + inputUrl;
+		$.ajax({url:ajaxUrl, type: "GET", dataType: 'json', success: function(data) {
+			addSystemResponseData(data);
+		}});
+	}else{
+		alert('Category URL is invalid');
+		$("#query-submit").prop("disabled", "true");
+	}
+}
+
+/*function ifFilterValueExists(filter) {
+	var flag = false;
+	$(".filterValueLabel-" + filter.filterName).each(function() {
+		if($(this).html() == filter.value) {
+			flag = true;
+		}
+	});
+	return flag;
+}*/
+
+function removeCategory(id) {
+	$('#selectedCategories').html("");
+	$('#selectedFilters').html("");
+	$('#selectedRangeFilters').html("");
+	$('#filter-search').typeahead('destroy');
+	categoryId = "";
+	categoryUrl = "";
+	searchId = "";
+	$("#products").html("");
+	$("#load-more").hide();
+	$("#paginationTab").html("");
+}
+
+/*function removeFilter(filterName) {
+	$("#filter-" + filterName).remove();
+	//updateFilters();
+}*/
+
+/*function removeFilterValue(filterName, value) {
+	$(".filterValueLabel-" + filterName).each(function() {
+		if(encodeURIComponent($(this).html()) == value) {
+			$(this).parent().remove();
+		}
+	});
+	if($('#filterValue-' + filterName).html() == "") {
+		removeFilter(filterName);
+	}
+	updateFilters();
+}*/
+
+function setFilters() {
+	/*var ajaxUrl = '/admin/landingPage/getFiltersForCategoryUrl?url=' + categoryUrl;
+	$.ajax({url:ajaxUrl, type: "GET", dataType: 'json', success: function(data) {
+		setData(data.filters);
+	}});	*/
+	
+	$.ajax({
+		url: 'getFiltersForCategoryUrl',
+		data: {'url': $('#filters-url').val()},
+		dataType: 'json'
+	}).
+	  done(function(data){
+	  	var compiledTemplate = Hogan.compile($('#activatedFilters').text());
+	  	categoryUrl = data.categoryUrl;
+	  	searchId = data.searchId;
+	  	$('#filterTableCtr').html(compiledTemplate.render(data));
+	  	$("#query-submit").removeAttr("disabled");
+	  	$("#url-submit").prop("disabled", "true");
+	  })
+	  .
+	  fail(function(){
+	  	alert('Sorry, the URL given has # or is invalid. Did you click a sort option by mistake? Please retry with the correct URL');
+	  })
+	  .always(function(){
+	  	$("#spinner").hide();
+	  })
+}
+
+//It constructs data for typehead and makes each filter type as Head
+/*function setData(data) {
+	var unitArray = new Array();
+	var size = data.length;
+	for ( var int = 0, int3 = 0; int < data.length; int++) {
+		var dataElement = data[int];
+		if(dataElement.visible) {
+			if(dataElement.displayType == 'rangeSlider') {
+				addRangeFilter(dataElement);
+			} else {
+				var unit = new Object();
+				unit.local = new Array();
+				for ( var int2 = 0; int2 < dataElement.displayValues.length; int2++) {
+					var dataValueElement = dataElement.displayValues[int2];
+					var local=new Object();
+					local.name=dataElement.name;
+					local.limit=typeaheadLimit;
+					local.tokens=new Array();
+					local.tokens[0] = dataValueElement.value;
+					local.value=dataValueElement.value;
+					local.filterName=dataElement.filterName;
+					unit.local[int2]=local;
+				}
+				unit.header=String.concat('<h3 class="typeahead-header">',dataElement.name,'</h3>');
+				unit.highlight=true;
+				unitArray[int3++] = unit;	
+			}
+		}
+	}
+	$('#filter-search').typeahead('destroy');
+	if(size > 0) {
+		$('#filter-search').typeahead(unitArray);
+	}
+}*/
+
+function updateQueryData(query) {
+	resetAll();
+	queryId = query.id;
+	category = query.minCategoryDTO;
+	$("#queryName").val(query.name);
+	$('#filters-url').val(decodeURIComponent(query.url));
+	removeCategory();
+	addCategory(category, false);
+	/*var filterValueDTOs = query.filterValueDTOs;
+	for( var i = 0 ; i < filterValueDTOs.length ; i++) {
+		var filterName = filterValueDTOs[i].filterName;
+		var filterValues = filterValueDTOs[i].values;
+		var filterType = filterValueDTOs[i].type;
+		if(filterType  == 'rangeSlider') {
+			addRangeFilter(filterValueDTOs[i]);
+			$("#filter-" + filterName).addClass("rangeSelected");
+		} else {
+			addFilter(filterValueDTOs[i], false);
+		}
+	}*/
+	//updateFilters();
+}
+
+function getQuery(query) {
+	resetAll();
+	var ajaxUrl = "/admin/landingPage/getQueryById?queryId=" + query.id ;
+	$.ajax({url:ajaxUrl, type: "GET", dataType: 'json', success: function(data) {
+		if(data != undefined && data != "") {
+			updateQueryData(data);
+			$("#addEditQuery").tab('show');
+
+		}
+	}});
+}
+
+function resetAll() {
+	queryId = "";
+	filters = "";
+	categoryId = "";
+	categoryUrl = "";
+	searchId = "";
+	$('#filter-search').typeahead('destroy');
+	removeValidation($("#category-search"));
+	removeValidationFromImportantFields();
+	$("#filterTableCtr").empty();
+	$("#selectedCategories").html("");
+	$("#selectedFilters").html("");
+	$("#selectedRangeFilters").html("");
+	$("#products").html("");
+	$('.form-horizontal').trigger('reset')
+	$("#load-more").hide();
+	$("#message").html("");
+	$("#paginationTab").html("");
+}
+
+$('#category-search').typeahead([
+  {
+	    valueKey: 'name',
+	    local: subCategories,                                           
+	    template: [                                                                 
+	        '<p class="name">{{name}} - ({{url}})</p>',
+	    ].join(''), 
+	    highlight: true,
+	   	limit: typeaheadLimit,
+	    engine: Hogan
+  }
+]);
+
+
+$('#query-search').typeahead([
+  {
+	    valueKey: 'name',
+	    local: queries,
+	    template: [                                                                 
+	   	        '<p class="name">{{name}}</p>',
+	   	].join(''),
+	   	highlight: true,
+	   	limit: typeaheadLimit,
+	    engine: Hogan
+  }
+]);
+
+//It is executed once the user presses the tab button
+/*$('#category-search').on('typeahead:autocompleted', function (object, datum) {
+	addCategory(datum, true);
+});*/
+
+
+//Works if the user has selected the option
+/*$('#category-search').on('typeahead:selected', function (object, datum) {
+	addCategory(datum, true);
+});*/
+
+//It is executed once the user presses the tab button
+/*$('#filter-search').on('typeahead:autocompleted', function (object, datum) {
+	addFilter(datum,true);
+});*/
+
+//Works if the user has selected the option
+/*$('#filter-search').on('typeahead:selected', function (object, datum) {
+	addFilter(datum, true);
+});*/
+
+//It is executed once the user presses the tab button
+$('#query-search').on('typeahead:autocompleted', function (object, datum) {
+	getQuery(datum);
+});
+
+//Works if the user has selected the option
+$('#query-search').on('typeahead:selected', function (object, datum) {
+	getQuery(datum);
+});
+
+$('.typeahead.input-sm').siblings('input.tt-hint').addClass('hint-small');
+$('.typeahead.input-lg').siblings('input.tt-hint').addClass('hint-large');
+
+$("#load-more").hide();
+$("#query-submit").prop("disabled", "true");
+
+
+$("#url-submit").on("click", function() {
+	$("#spinner").show();
+	$.ajax({
+		url: 'getFiltersForCategoryUrl',
+		data: {'url': $('#filters-url').val()},
+		dataType: 'json'
+	}).
+	  done(function(data){
+	  	var compiledTemplate = Hogan.compile($('#activatedFilters').text());
+	  	categoryUrl = data.categoryUrl;
+	  	searchId = data.searchId;
+	  	$('#filterTableCtr').html(compiledTemplate.render(data));
+	  	$("#query-submit").removeAttr("disabled");
+	  	$("#url-submit").prop("disabled", "true");
+	  })
+	  .
+	  fail(function(){
+	  	alert('Sorry, the URL given has # or is invalid. Did you click a sort option by mistake? Please retry with the correct URL.');
+	  })
+	  .always(function(){
+	  	$("#spinner").hide();
+	  })
+});
+
+$("#query-submit").click(function(){
+	submitQuery();
+});
+
+$("#query-reset").click(function(){
+	resetAll();
+});
+
+
+$('#filters-url').on('keydown', function(e){
+	$("#url-submit").removeAttr("disabled");
+	$("#query-submit").prop("disabled", "true");
+});

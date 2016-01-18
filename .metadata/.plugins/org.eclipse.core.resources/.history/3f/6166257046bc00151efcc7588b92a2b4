@@ -1,0 +1,134 @@
+/* Js Functions of indexer admins 
+ */
+
+function addError(message) {
+	$("#message")
+			.html(
+					'<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Error!</h4>'
+							+ message + '</div>');
+}
+
+function addMessage(message) {
+	$("#message")
+			.html(
+					'<div class="alert alert-info alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Info:</h4>'
+							+ message + '</div>');
+}
+
+function addSuccessMessage(message) {
+	$("#message")
+			.html(
+					'<div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Success!</h4>'
+							+ message + '</div>');
+}
+
+function removeMessage() {
+	$("#message").html('');
+}
+
+function editAC(id) {
+	var elementPattern = "#pattern-" + id;
+	var elementRoles = "#roles-" + id;
+	var elementLink = "#link-" + id;
+	var elementFeature = "#feature-" + id;
+	var elementVisible = "#visible-" + id;
+	var elementEdit = "#edit-ac-" + id;
+	var elementSubmit = "#submit-ac-" + id;
+
+	$(elementPattern).removeAttr('disabled');
+	$(elementRoles).removeAttr('disabled');
+	$(elementLink).removeAttr('disabled');
+	$(elementFeature).removeAttr('disabled');
+	$(elementVisible).removeAttr('disabled');
+	$(elementSubmit).removeAttr('hidden');
+	$(elementEdit).attr('hidden', 'true');
+}
+
+function newAC() {
+	var elementPattern = "#pattern-new";
+	var elementRoles = "#roles-new";
+	var elementLink = "#link-new";
+	var elementFeature = "#feature-new";
+	var elementVisible = "#visible-new";
+	var elementNew = "#new-ac";
+	var elementSubmit = "#submit-ac";
+
+	$(elementPattern).removeAttr('disabled');
+	$(elementRoles).removeAttr('disabled');
+	$(elementLink).removeAttr('disabled');
+	$(elementFeature).removeAttr('disabled');
+	$(elementVisible).removeAttr('disabled');
+	$(elementNew).attr('hidden', 'true');
+	$(elementSubmit).removeAttr('hidden');
+}
+
+function submitAC(id) {
+	var elementPattern = "#pattern-" + id;
+	var elementRoles = "#roles-" + id;
+	var elementLink = "#link-" + id;
+	var elementFeature = "#feature-" + id;
+	var elementVisible = "#visible-" + id;
+	$(elementPattern).attr('disabled', 'true');
+	$(elementRoles).attr('disabled', 'true');
+	$(elementLink).attr('disabled', 'true');
+	$(elementFeature).attr('disabled', 'true');
+	$(elementVisible).attr('disabled', 'true');
+	var pattern = $(elementPattern).val();
+	var roles = $(elementRoles).val();
+	var link = $(elementLink).val();
+	var feature = $(elementFeature).val();
+	var visible = $(elementVisible).val();
+	var ajaxUrl = "/admin/accessControl/saveOrUpdateAC?id=" + id + "&pattern="
+			+ pattern + "&roles=" + roles + "&link=" + link + "&feature=" + feature + "&visible=" + visible
+			+ "&action=u";
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function submitNewAC() {
+	var elementPattern = "#pattern-new";
+	var elementRoles = "#roles-new";
+	var elementLink = "#link-new";
+	var elementFeature = "#feature-new";
+	var elementVisible = "#visible-new";
+	$(elementPattern).attr('disabled', 'true');
+	$(elementRoles).attr('disabled', 'true');
+	$(elementLink).attr('disabled', 'true');
+	$(elementFeature).attr('disabled', 'true');
+	$(elementVisible).attr('disabled', 'true');
+	var pattern = $(elementPattern).val();
+	var roles = $(elementRoles).val();
+	var link = $(elementLink).val();
+	var feature = $(elementFeature).val();
+	var visible = $(elementVisible).val();
+	var ajaxUrl = "/admin/accessControl/saveOrUpdateAC?pattern=" + pattern + "&roles="
+			+ roles + "&link=" + link + "&feature=" + feature + "&visible=" + visible + "&action=s";
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}

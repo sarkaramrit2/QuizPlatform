@@ -1,0 +1,19 @@
+package com.quiz.utils;
+
+import org.apache.http.client.methods.HttpPost;
+import org.apache.solr.common.SolrInputDocument;
+
+import com.quiz.enums.SystemProperty;
+
+@SuppressWarnings("deprecation")
+public class SolrUtils {
+	
+	public static HttpPost getHttpPost(SystemProperty property){
+		return new HttpPost(property.getPropertyValue()+"/solr/update");
+	}
+
+	public static SolrInputDocument buildSolrDoc(QuestionDTO quesDTO) {
+		SolrInputDocument solrDoc = new SolrInputDocument();
+		return null;
+	}
+}

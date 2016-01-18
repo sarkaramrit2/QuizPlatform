@@ -1,0 +1,65 @@
+<%@ include file="/tld_includes.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<tiles:insertTemplate template="/views/layout/adminBaseTheme.jsp">
+	<tiles:putAttribute name="title" value="Suggestor Admin" />
+	<tiles:putAttribute name="head">
+	</tiles:putAttribute>
+	<tiles:putAttribute name="deferredScript">
+		<script type="text/javascript"
+			src="${path.js('suggestor/suggestor-validations.js')}"></script>
+		<script type="text/javascript"
+			src="${path.js('suggestor/suggestor-admin-functions.js')}"></script>
+	</tiles:putAttribute>
+	<tiles:putAttribute name="body">
+
+		<div style="margin-left: 10px; margin-right: 10px">
+			<c:set var="title" value="Suggestor Admin" />
+			<%@include file="brand.jsp"%>
+			<div id="message"></div>
+
+			<div class="tabbable tabs-below">
+				<!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<!-- <li><a id="suggestionCategory" href="#tab3" data-toggle="tab">Suggestion
+							Category</a></li> -->
+					<li><a id="suggestionBucket" href="#tab3" data-toggle="tab">Suggestion
+							Bucket</a></li>
+					<li><a id="suggestionDetails" href="#tab4" data-toggle="tab">Suggestion
+							Details</a></li>
+					<!-- <li><a id="indexsuggestion" href="#tab6" data-toggle="tab">Index
+							Suggestion</a>
+					</li> -->
+					<li><a id="indexsuggestion" href="#tab5" data-toggle="tab">Index
+							Suggestion On Bucket</a>
+					</li>
+					<li><a id="deletesuggestion" href="#tab6" data-toggle="tab">Delete
+							Suggestion</a>
+					</li>
+				</ul>
+				<div class="tab-content"
+					style="height: 400px; padding: 10 px; margin-top: 10px">
+					<%-- <div class="tab-pane" id="tab3">
+						<%@include file="suggestor/suggestionCategory.jsp"%>
+					</div> --%>
+					<div class="tab-pane" id="tab3">
+						<%@include file="suggestor/suggestionBucket.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab4">
+						<%@include file="suggestor/suggestionDetails.jsp"%>
+					</div>
+					<%-- <div class="tab-pane" id="tab6">
+						<%@include file="suggestor/indexsuggestion.jsp"%>
+					</div> --%>
+					<div class="tab-pane" id="tab5">
+						<%@include file="suggestor/indexsuggestionOnBucket.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab6">
+						<%@include file="suggestor/deletesuggestion.jsp"%>
+					</div>
+				</div>
+			</div>
+		</div>
+	</tiles:putAttribute>
+
+</tiles:insertTemplate>

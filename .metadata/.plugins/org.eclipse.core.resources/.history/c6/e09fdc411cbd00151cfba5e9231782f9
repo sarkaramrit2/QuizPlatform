@@ -1,0 +1,11 @@
+package com.quiz.utils;
+
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+
+public class SolrServerCreator {
+	
+	@SuppressWarnings("deprecation")
+	public static HttpSolrServer getSolrServer(SystemProperty property){
+		return new HttpSolrServer(property.getPropertyValue());
+	}
+}

@@ -1,0 +1,5 @@
+package com.quiz.indexer.impl;
+
+public class QuestionMongoIndexerImpl {
+
+}

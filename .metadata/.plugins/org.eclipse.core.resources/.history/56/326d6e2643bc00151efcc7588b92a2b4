@@ -1,0 +1,268 @@
+<%@ include file="/tld_includes.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<tiles:insertTemplate template="/views/layout/adminBaseThemeOld.jsp">
+	<tiles:putAttribute name="title" value="Trebuchet" />
+	<tiles:putAttribute name="head">
+		<link href="${path.css('bootstrap/bootstrap-fileupload.min.css')}"
+			rel="stylesheet" type="text/css" />
+
+	</tiles:putAttribute>
+	<tiles:putAttribute name="deferredScript">
+		<script type="text/javascript"
+			src="${path.js('manualPushing/manualPushing-admin-functions.js')}"></script>
+		<script type="text/javascript"
+			src="${path.js('bootstrap/bootstrap-fileupload.min.js')}"></script>
+		<script type="text/javascript">
+			var contextPath = '${contextPath}';
+		</script>
+	</tiles:putAttribute>
+	<tiles:putAttribute name="body">
+		<div style="margin-left: 10px; margin-right: 10px"
+			class="form-horizontal">
+			<div class="navbar">
+				<div class="navbar-inner">
+					<a class="brand">Trebutchet Admin</a>
+				</div>
+			</div>
+			<div id="message"></div>
+
+			<div class="submit-button-container">
+				<a href="#upload" role="button" class="btn btn-medium btn-primary"
+					data-toggle="modal" align="right"><i
+					class="icon-arrow-up icon-white"></i>Upload Products</a>
+			</div>
+			<div class="submit-button-container">
+				<a href="#instructions" role="button"
+					class="btn btn-medium btn-primary" data-toggle="modal"
+					align="right">Special Instructions</a>
+
+
+				<div id="instructions" class="modal hide fade" tabindex="-1"
+					role="dialog" aria-labelledby="instructionsId" aria-hidden="true">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">×</button>
+						<h3 id="instructionsId">Special Instructions</h3>
+					</div>
+					<div class="modal-body">
+						<ol>
+							<li>IF there is a blank column in any row it wont pick the
+								POG ID's after the empty colum</li>
+							<li>If there is any blank row, system will ignore all the
+								categories after the blank row</li>
+							<li>IF there are 2 rows with same Page URL then the xls will
+								get rejected</li>
+							<li>IF a row has duplicate POG id's system will reject the
+								XLS</li>
+							<li>Category and subcategory are independent of each other
+								to display different products on top</li>
+							<li>This will only display on category / subcategory pages
+								but not on search results page</li>
+							<li>This is only applicable for products</li>
+							<li>Only files with extension *.xls will be uploaded</li>
+							<li>These products should be listed on top when sorting is
+								based on best sellers / popularity (configurable)</li>
+						</ol>
+					</div>
+					<div class="modal-footer">
+						<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+
+					</div>
+				</div>
+			</div>
+			<div id="upload" class="modal hide fade" tabindex="-1" role="dialog"
+				aria-labelledby="uploadLabel" aria-hidden="true">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true" id="xId">×</button>
+					<h3 id="uploadLabel">Upload .xls Sheet</h3>
+				</div>
+
+				<div class="modal-body" id="modelId">
+					<form method="post"
+						action="${path.http}/admin/productElevationSearch/upload"
+						enctype="multipart/form-data" id="uploadForm">
+
+						<div id="imageContent">
+
+
+							<div class="fileupload fileupload-new" data-provides="fileupload">
+								<div class="input-append">
+									<div class="uneditable-input span3">
+										<i class="icon-file fileupload-exists"></i> <span
+											class="fileupload-preview"></span>
+									</div>
+									<span class="btn btn-file"><span class="fileupload-new">Select
+											file</span><span class="fileupload-exists">Change</span><input
+										type="file" name='file' id='fileUpload' />
+									</span><a href="#" class="btn fileupload-exists"
+										data-dismiss="fileupload">Remove</a>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button class="btn" data-dismiss="modal" type="submit"
+									aria-hidden="true">Close</button>
+								<button class="btn btn-primary" onclick="loader()">Upload</button>
+
+							</div>
+						</div>
+					</form>
+
+				</div>
+				<div id="loaderDiv" style="padding: 14px 15px 15px;">
+					<div class="progress progress-striped active">
+						<div class="bar" style="width: 100%;"></div>
+					</div>
+				</div>
+
+			</div>
+
+
+			<div class="submit-button-container">
+				<p>
+					<a class="btn btn-medium btn-primary"
+						href="${path.http}/static/sample.xls" align="right"><i
+						class="icon-arrow-down icon-white"></i>Download Sample .xls sheet</a>
+				</p>
+			</div>
+
+			<div class="control-group info" style="background: none"
+				id="inputCategoryName">
+				<label class="control-label" for="categoryName">Select
+					Category:<span class="required">*</span> </label>
+				<div class="controls">
+					<select id="categoryName"
+						onchange="viewProductElevationSearch('${contextPath}');">
+						<option value="0">Please select Category</option>
+						<c:forEach items="${productCategories}" var="productCategory">
+							<option value="${productCategory.id}">${productCategory.name}</option>
+						</c:forEach>
+
+					</select>
+				</div>
+
+			</div>
+			 <div class="control-group">
+				<div class="controls">
+					<label class="checkbox">
+						<input type="checkbox" id="coming-soon"> Coming Soon?
+					</label>
+				</div>
+
+			</div>
+			<div id="pogs"></div>
+
+
+		</div>
+		<script>
+			var errorMessage = "";
+			var emptyRow = "";
+			var message = "";
+			var sheetMessage = "";
+			var pogError = "";
+		</script>
+		<c:if test="${not empty limit}">
+			<script>
+				errorMessage += "Failed Due to Exceeding the limit Products:${limit} in CategoryURLs:\n";
+			</script>
+		</c:if>
+		<c:forEach items="${manualPushingSheetResultDTOs}" var="row">
+			<c:if test="${row.limit=='false'}">
+				<script>
+					errorMessage += "${row.categoryURL}\n";
+				</script>
+			</c:if>
+
+		</c:forEach>
+		<c:if
+			test="${not empty invalidCategoryURLs || not empty duplicatedCategoryURLs}">
+			<script>
+				errorMessage += "Upload Failed due to:\n";
+			</script>
+		</c:if>
+		<c:if test="${invalidCategoryURLs != null }">
+			<c:if test="${not empty invalidCategoryURLs}">
+				<script>
+					errorMessage += "Invalid CategoryURLs:${invalidCategoryURLs}\n";
+				</script>
+			</c:if>
+		</c:if>
+		<c:if test="${duplicatedCategoryURLs != null }">
+			<c:if test="${not empty duplicatedCategoryURLs}">
+				<script>
+					errorMessage += "Duplicated CategoryURLs:${duplicatedCategoryURLs}\n";
+				</script>
+			</c:if>
+		</c:if>
+		<c:if test="${manualPushingSheetResultDTOs != null}">
+			<c:if test="${not empty manualPushingSheetResultDTOs}">
+				<script>
+					pogError = "Failed due to pogs...pls look into table."
+				</script>
+				<table class="table table-striped" id="errorPogs">
+					<thead>
+						<tr>
+							<th>S. No.</th>
+							<th>categoryURL</th>
+							<th>InvalidPOGs</th>
+							<th>DuplicatePOGs</th>
+							<th>Non-IntegerPOGs</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						<c:forEach items="${manualPushingSheetResultDTOs}" var="dto"
+							varStatus="ctr">
+							<tr>
+								<td>${ctr.index + 1}</td>
+								<td>${dto.categoryURL}</td>
+								<td><c:choose>
+										<c:when test="${not empty dto.invalidPOGs}">${dto.invalidPOGs}</c:when>
+										<c:otherwise>--</c:otherwise>
+									</c:choose>
+								</td>
+								<td><c:choose>
+										<c:when test="${not empty dto.duplicatePOGs}">${dto.duplicatePOGs}</c:when>
+										<c:otherwise>--</c:otherwise>
+									</c:choose>
+								</td>
+								<td><c:choose>
+										<c:when test="${not empty dto.stringPOGs}">${dto.stringPOGs}</c:when>
+										<c:otherwise>--</c:otherwise>
+									</c:choose>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</c:if>
+		</c:if>
+
+
+		<c:if test="${emptyRow =='true'}">
+			<script>
+				var emptyRow = "FAILED to upload file due to Empty Row. ";
+			</script>
+
+		</c:if>
+
+		<c:if test="${message =='success'}">
+
+			<script>
+				var message = "Suceessfully Uploaded and Changes Will reflect after 1 Hour";
+			</script>
+
+		</c:if>
+		<c:if test="${sheetMessage =='Only .xls Sheets Accepted'}">
+			<script>
+				var sheetMessage = "Only .xls Sheets Accepted";
+			</script>
+
+		</c:if>
+
+
+
+	</tiles:putAttribute>
+
+</tiles:insertTemplate>

@@ -1,0 +1,89 @@
+<%@ include file="/tld_includes.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<tiles:insertTemplate template="/views/layout/adminBaseTheme.jsp">
+	<tiles:putAttribute name="title" value="Indexer Admin" />
+	<tiles:putAttribute name="head">
+	</tiles:putAttribute>
+	<tiles:putAttribute name="deferredScript">
+		<script type="text/javascript"
+			src="${path.js('indexer/indexer-validations.js')}"></script>
+		<script type="text/javascript"
+			src="${path.js('indexer/indexer-admin-functions.js')}"></script>
+	</tiles:putAttribute>
+	<tiles:putAttribute name="body">
+
+		<div style="margin-left: 10px; margin-right: 10px">
+			<c:set var="title" value="Indexer Admin" />
+			<%@include file="brand.jsp"%>
+			<div id="message"></div>
+
+			<div class="tabbable tabs-below">
+				<!-- Only required for left/right tabs -->
+				<ul class="nav nav-tabs">
+					<li class="active"><a id="register" href="#tab1"
+						data-toggle="tab">Register Consumer</a>
+					</li>
+					<li><a id="unregister" href="#tab2" data-toggle="tab">Unregister</a>
+					</li>
+					<li><a id="status" href="#tab3" data-toggle="tab">Current
+							Status</a>
+					</li>
+					<li><a id="manual" href="#tab4" data-toggle="tab">Manually
+							Index</a>
+					</li>
+					<li><a id="flush" href="#tab5" data-toggle="tab">Flush</a>
+					</li>
+					<li><a id="flush" href="#tab6" data-toggle="tab">Reload
+							Cache</a>
+					</li>
+					<li><a id="flush" href="#tab7" data-toggle="tab">Reload
+							Metadata Cache</a>
+					</li>
+					<li><a id="flush" href="#tab8" data-toggle="tab">Indexer
+							Configuration</a>
+					</li>
+					<li><a id="flush" href="#tab9" data-toggle="tab">Consumer
+							Configuration</a>
+					</li>
+					<li><a id="kafka" href="#tab10" data-toggle="tab">Kafka Consumer Status</a>
+					</li>
+				</ul>
+				<div class="tab-content"
+					style="height: 400px; padding: 10 px; margin-top: 10px">
+					<div class="tab-pane active" id="tab1">
+						<%@include file="indexer/register.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab2">
+						<%@include file="indexer/unregister.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab3">
+						<%@include file="indexer/currentstatus.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab4">
+						<%@include file="indexer/manualIndex.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab5">
+						<%@include file="indexer/flush.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab6">
+						<%@include file="indexer/reloadCache.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab7">
+						<%@include file="indexer/reloadMetadataCache.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab8">
+						<%@include file="indexer/indexerConfiguration.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab9">
+						<%@include file="indexer/consumerConfiguration.jsp"%>
+					</div>
+					<div class="tab-pane" id="tab10">
+						<%@include file="indexer/kafkaConfiguration.jsp"%>
+					</div>
+				</div>
+			</div>
+		</div>
+	</tiles:putAttribute>
+
+</tiles:insertTemplate>

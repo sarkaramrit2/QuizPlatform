@@ -1,0 +1,229 @@
+package QuizIndexerController;
+
+import java.awt.PageAttributes.MediaType;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+
+@Controller
+@RequestMapping("/admin")
+public class QuizIndexerController {
+
+    private static final Logger                  LOGGER                  = LoggerFactory.getLogger(QuizIndexerController.class);
+    
+    @Autowired
+    private IFileParsingService fileParser;
+
+    @Autowired
+    private IQueryBoost queryBoostUpdater;
+
+    @Autowired
+    private IRequeueService                requeueService;
+    
+    @RequestMapping("/queryBoost")
+    public String tagAdmin(ModelMap map) {
+        return "admin/queryBoost";
+    }
+
+    private QueryMockBoostDTO getPogsFromQuery(String query) {
+        return queryBoostUpdater.getQuery(query.trim().toLowerCase());
+    }
+    
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/queryBoost/getPogsByQuery")
+    @GET
+    @ResponseBody
+    public SystemResponse getPogsByQuery(@RequestParam("query") String query) {
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+        try {
+            response.addItem("queryBoost", getPogsFromQuery(query.trim().toLowerCase()));
+            response.setStatus(ResponseStatus.SUCCESS.responseType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not retrieve tags from database due to exception " + e.getMessage());
+        }
+        LOGGER.info("Response::"+response);
+        return response;
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/queryBoost/deleteAllByQuery")
+    @POST
+    @ResponseBody
+    public SystemResponse deleteAllByQuery(@RequestParam("query") String query) {
+        
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+
+        try {
+            List<QueryQueueIndexDTO> queueIndexDTOList = queryBoostUpdater.deletionIndexByQuery(query.trim().toLowerCase());
+            queryBoostUpdater.deleteDataByQuery(query);
+            requeueService.requeue((Serializable) queueIndexDTOList, Listener.QUERY_BOOSTING_LISTENER);
+            response.addItem("queryBoost", new QueryMockBoostDTO(query));
+            response.setStatus(ResponseStatus.SUCCESS.responseType());
+            response.setMessage("Successfully deleted query data from database");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not complete delete query operation due to exception " + e.getMessage());
+        }
+        LOGGER.info("Response::"+response);
+        return response;
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/queryBoost/updateQuery")
+    @POST
+    @ResponseBody
+    public SystemResponse updateQuery(@RequestBody QueryMockBoostDTO queryBoost) {
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+        if (queryBoost.getQuery() == null || queryBoost.getPogs().size() == 0) {
+            response.setMessage("Empty Data | Nothing Added");
+        } else {
+            queryBoostUpdater.updateData(queryBoost);
+        }
+
+        try {
+            response.addItem("queryBoost", getPogsFromQuery(queryBoost.getQuery()));
+            response.setStatus(ResponseStatus.SUCCESS.responseType());
+            response.setMessage("Pog added/updated successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not add/update Pog due to exception " + e.getMessage());
+        }
+        LOGGER.info("Response::"+response);
+        return response;
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/queryBoost/addPog")
+    @POST
+    @ResponseBody
+    public SystemResponse addQuery(@RequestBody QueryMockBoostDTO queryBoost) {
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+        if (queryBoost.getQuery() == null || queryBoost.getPogs().size() == 0) {
+            response.setMessage("Empty Data | Nothing Added");
+        } else {
+            queryBoostUpdater.addData(queryBoost);
+        }
+
+        try {
+            response.addItem("queryBoost", getPogsFromQuery(queryBoost.getQuery()));
+            response.setStatus(ResponseStatus.SUCCESS.responseType());
+            response.setMessage("Pog added/updated successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not add/update Pog due to exception " + e.getMessage());
+        }
+        LOGGER.info("Response::"+response);
+        return response;
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/queryBoost/deletePog")
+    @POST
+    @ResponseBody
+    public SystemResponse deletePog(@RequestParam("_id") String _id) {
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+        List<QueryQueueIndexDTO> qDtoList = new ArrayList<QueryQueueIndexDTO>();
+        QueryQueueIndexDTO qDto = queryBoostUpdater.deletionIndex(_id);
+        qDtoList.add(qDto);
+        try {
+            requeueService.requeue((Serializable) qDtoList, Listener.QUERY_BOOSTING_LISTENER);
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        try {
+            QueryMockBoostDTO dtoAfterDeletion = getPogsFromQuery(queryBoostUpdater.deleteData(_id));
+            dtoAfterDeletion.getPogs().remove(new QueryValueDTO(_id, qDto.getPogId(), null));
+            response.addItem("queryBoost", dtoAfterDeletion);
+            response.setStatus(ResponseStatus.SUCCESS.responseType());
+            response.setMessage("Pog deleted successfully | Deletion indexed to Queue");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not delete Pog due to exception " + e.getMessage());
+        }
+        return response;
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/queryBoost/indexQueryPog")
+    @POST
+    @ResponseBody
+    public SystemResponse indexQueryPog(@RequestParam("query") String query) {
+
+        System.out.println("Index-> " + query);
+        SystemResponse response = new SystemResponse();
+        try {
+            List<QueryQueueIndexDTO> queries = queryBoostUpdater.getQueries(query.trim().toLowerCase());
+            requeueService.requeue((Serializable) queries, Listener.QUERY_BOOSTING_LISTENER);
+            response.setStatus(ResponseStatus.SUCCESS.responseType());
+            response.setMessage("Query with new POGS are indexed successfully ");
+        } catch (Exception e) {
+            response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+            response.setMessage("Error while indexing POG ");
+            // e.printStackTrace();
+        }
+        LOGGER.info("Response::"+response);
+        return response;
+    }
+
+    public File multipartToFile(MultipartFile multipart) throws IllegalStateException, IOException {
+        File convFile = new File(multipart.getOriginalFilename());
+        multipart.transferTo(convFile);
+        return convFile;
+    }
+
+    @RequestMapping("/queryBoost/uploadFile")
+    @POST
+    public String uploadFile(@RequestParam("file") MultipartFile multipart, ModelMap model) throws IllegalStateException, IOException {
+
+    	if(multipart.isEmpty()){
+    		model.addAttribute("message", "No File Uploaded");
+            return "admin/queryBoost";
+    	}
+        
+        File file = multipartToFile(multipart);
+        List<QueryMockBoostDTO> queryFileDTOs = null;
+        List<String> pogIdList = null;
+
+        try {
+            queryFileDTOs = fileParser.prcoessQueryBoostFile(file);
+        } catch (Exception e) {
+            if (e.getCause() == null)
+                model.addAttribute("message", "FAILED to upload file :" + e.getMessage());
+            else
+                model.addAttribute("message", "FAILED to upload file :" + e.getCause().getMessage());
+            return "admin/queryBoost";
+        }
+
+        try {
+            pogIdList = queryBoostUpdater.uploadFile(queryFileDTOs);
+        } catch (Exception e) {
+            model.addAttribute("message", "FAILED to upload file :" + e.getMessage());
+            return "admin/queryBoost";
+        }
+        try {
+            List<QueryQueueIndexDTO> queries = queryBoostUpdater.getQueriesFromPogIdList(pogIdList);
+            requeueService.requeue((Serializable) queries, Listener.QUERY_BOOSTING_LISTENER);
+        } catch (Exception e) {
+            model.addAttribute("message", "FAILED to index file :" + e.getMessage());
+        }
+        model.addAttribute("success", "Upload Successfuly ");
+        return "admin/queryBoost";
+    }
+
+}

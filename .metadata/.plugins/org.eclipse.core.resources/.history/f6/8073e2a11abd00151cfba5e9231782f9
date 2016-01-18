@@ -1,0 +1,7 @@
+package com.quiz.utils;
+
+public enum SystemProperty {
+
+	
+	
+}

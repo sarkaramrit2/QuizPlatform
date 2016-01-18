@@ -1,0 +1,41 @@
+package com.quiz.utils;
+
+import org.apache.http.client.methods.HttpPost;
+import org.apache.solr.common.SolrInputDocument;
+
+import com.quiz.core.dto.AnswerDTO;
+import com.quiz.core.dto.QuestionDTO;
+import com.quiz.enums.SystemProperty;
+
+@SuppressWarnings("deprecation")
+public class SolrUtils {
+	
+	public static HttpPost getHttpPost(SystemProperty property){
+		return new HttpPost(property.getPropertyValue()+"/solr/update");
+	}
+
+	public static SolrInputDocument buildSolrDoc(QuestionDTO quesDTO) {
+		SolrInputDocument solrDoc = new SolrInputDocument();
+		solrDoc.addField("id", quesDTO.getQuesId());
+		solrDoc.addField("question", quesDTO.getQuestion());
+		solrDoc.addField("question_url", quesDTO.getQuestionUrl());
+		solrDoc.addField("answer_type", quesDTO.getAnswerType());
+		solrDoc.addField("category", quesDTO.getCategory());
+		solrDoc.addField("difficulty_level", quesDTO.getDifficulyLevel());
+		solrDoc.addField("sub_category", quesDTO.getSubCategory());
+		solrDoc.addField("submitted_by", quesDTO.getSubmittedBy());
+		for(AnswerDTO answer: quesDTO.getAnwsers()){
+			SolrInputDocument doc = new SolrInputDocument();
+			doc.addField("answer", answer.getAnswerOption());
+			doc.addField("is_answer", answer.isAnswer());
+		}
+		solrDoc.addField("answers", quesDTO.getAnwsers());
+		solrDoc.addField("hints", quesDTO.getHints());
+		
+		
+		
+		
+		
+		return null;
+	}
+}

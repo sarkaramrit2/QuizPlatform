@@ -1,0 +1,6 @@
+package com.quiz.utils;
+
+public class SolrServerCreator {
+	
+	public static getSolrServer();
+}

@@ -1,0 +1,8 @@
+package com.quiz.utils;
+
+public class SolrServerCreator {
+	
+	public static HttpSolrServer getSolrServer(String server){
+		return server = new HttpSolrServer(SystemProperty.SOLR_SERVER.getProperty());
+	}
+}

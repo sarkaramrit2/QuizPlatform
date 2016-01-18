@@ -1,0 +1,71 @@
+package com.quiz.indexer.questions.impl;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.common.SolrInputDocument;
+
+import com.quiz.core.dto.QuestionDTO;
+import com.quiz.enums.SystemProperty;
+import com.quiz.indexer.questions.IQuestionSolrIndexer;
+import com.quiz.utils.SolrServer;
+import com.quiz.utils.SolrUtils;
+
+
+public class QuestionSolrIndexerImpl implements IQuestionSolrIndexer{
+	
+	private static final  String APP_JSON = "application/json";
+
+	public int indexQuesInSolr(List<QuestionDTO> questions) throws SolrServerException, IOException{
+		
+		HttpSolrServer server = SolrServer.getSolrServer(SystemProperty.SOLR_MASTER_SERVER);
+		List<SolrInputDocument> solrDocs = new ArrayList<SolrInputDocument>();
+		for(QuestionDTO quesDTO : questions){
+			SolrInputDocument doc = SolrUtils.buildSolrDoc(quesDTO);
+			solrDocs.add(doc);
+			if(solrDocs.size()==100){
+				server.add(solrDocs);
+				server.commit();
+				solrDocs = new ArrayList<SolrInputDocument>();
+			}
+		}
+			
+		return 0;
+	}
+	
+	public static void main(String[] args) {
+		HttpSolrServer server = SolrServer.getSolrServer(SystemProperty.SOLR_MASTER_SERVER);
+		List<SolrInputDocument> solrDocs = new ArrayList<SolrInputDocument>();
+		
+		List<String> list = new ArrayList<String>();
+		ABC obj = new ABC("abc", def)
+		
+		for(QuestionDTO quesDTO : questions){
+			SolrInputDocument doc = SolrUtils.buildSolrDoc(quesDTO);
+			solrDocs.add(doc);
+			if(solrDocs.size()==100){
+				server.add(solrDocs);
+				server.commit();
+				solrDocs = new ArrayList<SolrInputDocument>();
+			}
+		}
+
+	}
+	
+}
+
+
+class ABC{
+	public String abc;
+	public List<String> def;
+	public ABC(String abc, List<String> def) {
+		super();
+		this.abc = abc;
+		this.def = def;
+	}
+	
+	
+}

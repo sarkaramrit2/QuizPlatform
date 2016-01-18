@@ -1,0 +1,10 @@
+package com.quiz.core.dto;
+
+public class CategoryDTO {
+	
+	private String catId;
+	private String catName;
+	private String catDesc;
+	private List<CategoryDTO>	subCateogies;
+
+}

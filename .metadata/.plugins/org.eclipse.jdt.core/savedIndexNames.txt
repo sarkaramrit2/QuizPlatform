@@ -1,0 +1,6 @@
+INDEX VERSION 1.127+/home/amrit/quiz/.metadata/.plugins/org.eclipse.jdt.core
+3942581913.index
+3189651959.index
+780295230.index
+862066040.index
+993943177.index

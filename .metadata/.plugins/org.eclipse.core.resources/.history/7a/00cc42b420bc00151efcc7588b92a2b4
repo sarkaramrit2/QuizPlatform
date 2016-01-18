@@ -1,0 +1,19 @@
+package com.quiz.core.dto;
+
+import java.util.List;
+
+public class QuestionDTO {
+
+	private int quesId;
+	private String category;
+	private String subCategory;
+	private String question;
+	private String questionUrl;
+	private String answerType;
+	private List<AnswerDTO> anwsers;
+	private List<HintDTO>	hints;
+	private String difficulyLevel;
+	private String submittedBy;
+	private boolean isLive;
+	
+}

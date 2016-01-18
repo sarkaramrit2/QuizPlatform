@@ -1,0 +1,65 @@
+
+<table cellpadding="0" cellspacing="0" border="0"
+	class="display dataTable" id="consumerTypeTable">
+	<thead>
+		<tr>
+			<th>S. No.</th>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Queue Name</th>
+			<th>Queue Url</th>
+			<th>Queue Type</th>
+			<th>Enabled</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		<c:forEach items="${consumerTypes}" var="consumer" varStatus="ctr">
+			<tr>
+				<td>${ctr.index + 1}</td>
+				<td><input id="cc-id-${consumer.id}" type="text"
+					value="${consumer.id}" disabled style="width: 20px; height: 20px;" />
+				</td>
+				<td><input id="cc-name-${consumer.id}" type="text"
+					value="${consumer.name}" disabled /></td>
+				<td><input id="cc-queue-name-${consumer.id}" type="text"
+					value="${consumer.queueName}" disabled
+					style="width: 100px; height: 20px;" /></td>
+				<td><input id="cc-queue-url-${consumer.id}" type="text"
+					value="${consumer.queueUrl}" disabled
+					style="width: 350px; height: 20px;" /></td>
+				<td><input id="cc-queue-type-${consumer.id}" type="text"
+					value="${consumer.queueType}" disabled
+					style="width: 100px; height: 20px;" /></td>
+				<td><input id="cc-enabled-${consumer.id}" type="text"
+					value="${consumer.enabled}" disabled
+					style="width: 40px; height: 20px;" /></td>
+				<td><input type="button" value="Edit"
+					id="cc-edit-consumer-${consumer.id}"
+					onclick="cceditConsumer(${consumer.id})"> <input
+					type="button" value="Submit" hidden
+					id="cc-submit-consumer-${consumer.id}"
+					onclick="ccsubmitConsumer(${consumer.id})"></td>
+			</tr>
+		</c:forEach>
+		<tr>
+			<td>New CC</td>
+			<td><input id="cc-id-new" type="text" value="" disabled
+				style="width: 20px; height: 20px;" /></td>
+			<td><input id="cc-name-new" type="text" value="" disabled /></td>
+			<td><input id="cc-queue-name-new" type="text" value="" disabled
+				style="width: 100px; height: 20px;" /></td>
+			<td><input id="cc-queue-url-new" type="text" value="" disabled
+				style="width: 350px; height: 20px;" /></td>
+			<td><input id="cc-queue-type-new" type="text" value="" disabled
+				style="width: 350px; height: 20px;" /></td>
+			<td><input id="cc-enabled-new" type="text" value="" disabled
+				style="width: 40px; height: 20px;" /></td>
+			<td><input type="button" value="Add New" id="cc-new-consumer"
+				onclick="ccnewConsumer()"> <input type="button"
+				value="Submit" hidden id="cc-submit-consumer"
+				onclick="ccsubmitNewConsumer()"></td>
+		</tr>
+	</tbody>
+</table>

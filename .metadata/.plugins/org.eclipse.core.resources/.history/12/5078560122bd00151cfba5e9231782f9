@@ -1,0 +1,59 @@
+package com.quiz.indexer.questions.impl;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.quiz.core.dto.QuestionDTO;
+import com.quiz.enums.SystemProperty;
+import com.quiz.indexer.questions.IQuestionSolrIndexer;
+import com.quiz.utils.ObjectToJSON;
+import com.quiz.utils.SolrUtils;
+
+@SuppressWarnings({ "deprecation" })
+public class QuestionSolrIndexerImpl implements IQuestionSolrIndexer{
+	
+	private static final  String APP_JSON = "application/json";
+
+	@SuppressWarnings("resource")
+	public int indexQuesInSolr(List<QuestionDTO> questions) throws ClientProtocolException, IOException {
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpPost postRequest = SolrUtils.getHttpPost(SystemProperty.SOLR_MASTER_SERVER);
+		StringEntity input = new StringEntity(ObjectToJSON.convertObjToJSON(questions));
+		input.setContentType(APP_JSON);
+		postRequest.setEntity(input);
+		HttpResponse response = httpClient.execute(postRequest);
+		return response.getStatusLine().getStatusCode();
+	}
+	
+	public static void main(String[] args) throws ClientProtocolException, IOException {
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpPost postRequest = SolrUtils.getHttpPost(SystemProperty.SOLR_MASTER_SERVER);
+		
+		ABC abc = new ABC("123", "234");
+		
+		StringEntity input = new StringEntity(ObjectToJSON.convertObjToJSON(abc));
+		input.setContentType(APP_JSON);
+		postRequest.setEntity(input);
+		HttpResponse response = httpClient.execute(postRequest);
+		System.out.println(response.getStatusLine().getStatusCode());
+	}
+}
+
+class ABC{
+	public String title;
+	public String author;
+	public ABC(String title, String author) {
+		super();
+		this.title = title;
+		this.author = author;
+	}
+	
+}

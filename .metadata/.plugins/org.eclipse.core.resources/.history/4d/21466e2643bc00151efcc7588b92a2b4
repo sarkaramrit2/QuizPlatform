@@ -1,0 +1,7 @@
+<div class="btn-group">
+	<a href="/admin/landingPage/campaignAdmin" style="text-decoration:none"><button type="button" class="btn btn-danger">Campaign Admin</button> </a>
+    <a href="/admin/landingPage/queryAdmin" style="text-decoration:none"><button type="button" class="btn btn-danger">Query Admin</button> </a> 
+    <a href="/admin/landingPage/campaignQueryMapper" style="text-decoration:none"><button type="button" class="btn btn-danger">Campaign Query Mapper Admin</button> </a>
+</div>
+<br/>
+<br/>

@@ -1,0 +1,79 @@
+<form class="form-horizontal" role="form">
+
+	<div class="form-group">
+
+		<div class="row">
+			<label class="control-label col-lg-2">Select Category :</label>
+			<div class="control-label active col-lg-4">
+				<jsp:include page="/views/admin/bootstrap/textInput.jsp">
+					<jsp:param value="parentcat-search" name="id" />
+					<jsp:param value="" name="text" />
+					<jsp:param value="col-lg-8" name="size" />
+					<jsp:param value="col-lg-8" name="labelSize" />
+					<jsp:param value="typeahead" name="inputClass" />
+				</jsp:include>
+
+			</div>
+		</div>
+
+		<div class="row">
+			<label class="control-label col-lg-2">Select Brand :</label>
+			<div class="col-lg-2" style="margin-bottom: 10px;">
+				<div id="pw-brandId">
+					<select id="view-pw-brand" class="form-control">
+					</select>
+				</div>
+			</div>
+
+			<label class="control-label col-lg-2">Priority :</label> 
+			<input type="text" class="control-label col-lg-2"
+				id="parentBrandPriorityId"></input>
+			<div class="col-lg-2">
+				<button class="btn btn-primary" type="button"
+					value="Update Priority" id="update-parentBrand-priority-button">Update
+					Priority</button>
+			</div>
+		</div>
+
+		<div class="row">
+			<label class="control-label col-lg-2">Select subCategory :</label>
+			<div class="col-lg-2" style="margin-bottom: 10px;">
+				<div id="pw-subId">
+					<select id="view-pw-subcat" class="form-control">
+					</select>
+				</div>
+			</div>
+
+			<label class="control-label col-lg-2">Priority :</label> 
+			<input type="text" class="control-label col-lg-2"
+				id="parentSubcatPriorityId"></input>
+			<div class="col-lg-2">
+				<button class="btn btn-primary" type="button"
+					value="Update Priority" id="update-parentSubcat-priority-button">Update Priority</button>
+			</div>
+		</div>
+
+	</div>
+
+</form>
+
+
+<div>
+	<div class="row">
+		<label class="control-label col-lg-8">Top Widget : </label>
+	</div>
+	<div class="col-lg-8">
+		<table class="table table-bordered table-hover table-condensed"
+			style="width: 600px" id="pw-topTable">
+			<thead>
+				<tr>
+					<th>S. No.</th>
+					<th>Category</th>
+					<th>Widget</th>
+					<th>Type</th>
+					<th>Priority</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>

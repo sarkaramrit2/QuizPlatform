@@ -1,0 +1,5 @@
+package com.quiz.utils;
+
+public class SolrServer {
+
+}

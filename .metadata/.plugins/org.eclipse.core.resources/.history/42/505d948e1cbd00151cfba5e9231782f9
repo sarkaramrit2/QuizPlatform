@@ -1,0 +1,11 @@
+package com.quiz.indexer.questions;
+
+import java.util.List;
+
+import com.quiz.core.dto.QuestionDTO;
+
+public interface IQuestionSolrIndexer {
+
+	private void indexQuesInSolr(List<QuestionDTO> questions);
+	
+}

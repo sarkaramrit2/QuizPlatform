@@ -1,0 +1,106 @@
+<%@ include file="/tld_includes.jsp"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<tiles:insertTemplate template="/views/layout/adminBaseTheme.jsp">
+	<tiles:putAttribute name="title" value="Filter Admin" />
+	<tiles:putAttribute name="head">
+		<link href="${path.css('jquery/jquery-ui.css')}" rel="stylesheet"
+			type="text/css" />
+		<link href="${path.css('typeahead/typeahead.css')}" rel="stylesheet"
+			type="text/css" />
+		<link
+			href="${path.css('bootstrap3/bootstrap-datetimepicker.min.css')}"
+			rel="stylesheet" type="text/css" />
+		<link href="${path.css('/landingpage.css')}" rel="stylesheet"
+			type="text/css" />
+		<link href="${path.css('bootstrap/bootstrap-fileupload.min.css')}"
+			rel="stylesheet" type="text/css" />
+		<script type="text/javascript"
+			src="${path.js('jquery/jquery-1.9.1.js')}"></script>
+		<script type="text/javascript" src="${path.js('jquery/jquery-ui.js')}"></script>
+		<script type="text/javascript">
+			var allFiltersList = ${allFilters};
+			var staticFiltersList = ${staticFilters};
+		</script>
+	</tiles:putAttribute>
+	<tiles:putAttribute name="deferredScript">
+		<script type="text/javascript"
+			src="${path.js('jquery/jquery.dataTables.js')}"></script>
+		<script type="text/javascript"
+			src="${path.js('jquery/jquery.dataTables.columnFilter.js')}"></script>
+		<script type="text/javascript"
+			src="${path.js('filter/filter-admin-validations.js')}"></script>
+		<script type="text/javascript"
+			src="${path.js('filter/filter-admin-functions.js')}"></script>
+	</tiles:putAttribute>
+	<tiles:putAttribute name="body">
+		<div style="margin-left: 10px; margin-right: 10px;">
+			<c:set var="title" value="Filter Admin" />
+			<%@include file="brand.jsp"%>
+			<div id="message"></div>
+
+			<div class="tabbable tabs-below">
+				<ul class="nav nav-tabs">
+					<li class="active"><a id="staticFiltersTab" href="#tab1"
+						data-toggle="tab">Static Filters</a></li>
+				</ul>
+			</div>
+			<div class="tab-content"
+				style="height: 400px; padding: 10 px; margin-top: 10px">
+				<div class="tab-pane active" id="tab1">
+					<label class="control-label col-lg-2" for="component">Update
+						filters: </label>
+					<div class="container">
+						<div class="row clearfix">
+							<div class="col-md-12 column">
+								<table class="table table-bordered table-hover" id="tab_logic">
+									<thead>
+										<tr>
+											<th class="text-center">S. No.</th>
+											<th class="text-center">Name</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr id='addr0'>
+											<td>1</td>
+											<!--<td><input type="text" name='name0' placeholder='Name'
+												class="form-control" />
+											</td> -->
+											<td><select id="name0" class="form-control"
+												data-placeholder="Please select a Filter"></select>
+											</td>
+										</tr>
+										<tr id='addr1'></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<a id="add_row" class="btn btn-primary pull-left">Add Row</a> <a
+							id='delete_row' class="pull-right btn btn-primary">Delete Row</a>
+					</div>
+					<br>
+					<div class="text-center">
+						<a id="update_filter" class="btn btn-primary">UpdateFilters</a>
+					</div>
+					
+					<br>
+					
+					<div>
+						<div class="container">
+							<table class="table table-bordered table-hover table-condensed"
+								style="width: 600px" id="staticFilterTable">
+								<thead>
+									<tr>
+										<th>Filter Name</th>
+										<th>Display Order</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+					</div>
+
+				</div>
+			</div>
+	</tiles:putAttribute>
+
+</tiles:insertTemplate>

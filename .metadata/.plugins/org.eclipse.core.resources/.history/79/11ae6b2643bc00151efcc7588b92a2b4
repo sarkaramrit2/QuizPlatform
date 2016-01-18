@@ -1,0 +1,134 @@
+/* All the validations of forms happen here 
+ * Functions called in this js are include indexer-admin-functions.js 
+ */
+
+$("#manualId").hover(function() {
+	$("#idToolTip").tooltip('destroy');
+	var tooltipMessage = $('#manualQueueType option:selected').attr('message');
+	$("#idToolTip").attr("title", tooltipMessage);
+	$("#idToolTip").tooltip('show');
+});
+
+$('#ccregister-all').click(function(event) {
+	var totalConsumerTypes = $('#totalConsumerTypes').html();
+	for ( var i = 0; i < totalConsumerTypes; i++) {
+		var elementCheckbox = "#ccregister-" + i;
+		if (this.checked) {
+			$(elementCheckbox).attr('checked', this.checked);
+		} else {
+			$(elementCheckbox).attr('checked', this.checked);
+		}
+	}
+});
+
+$("#cccount-all").keyup(function() {
+	var consumerCounts = $('#cccount-all').val();
+	var totalConsumerTypes = $('#totalConsumerTypes').html();
+	for ( var i = 0; i < totalConsumerTypes; i++) {
+		var elementCount = "#cccount-" + i;
+		$(elementCount).val(consumerCounts);
+	}
+});
+
+$("#register-submit")
+		.click(
+				function() {
+					var url = $('#registerUrl option:selected').attr('type');
+					var groupId = $('#registerUrl option:selected').attr('groupId');
+					var consumerTypes = '';
+					var consumerCounts = '';
+					if ($('#ccregister-all').is(":checked")) {
+						consumerTypes = 'all';
+						consumerCounts = $('#cccount-all').val();
+						if (isNaN(parseInt(consumerCounts))) {
+							addError('Enter a valid numeric value for number of consumers for all');
+							return false;
+						}
+					} else {
+						var totalConsumerTypes = $('#totalConsumerTypes')
+								.html();
+						for ( var i = 0; i < totalConsumerTypes; i++) {
+							var elementName = "#ccname-" + i;
+							var elementCount = "#cccount-" + i;
+							var elementCheckbox = "#ccregister-" + i;
+							consumerType = $(elementName).val();
+							consumerCount = $(elementCount).val();
+							if ($(elementCheckbox).is(":checked")) {
+								if (isNaN(parseInt(consumerCount))) {
+									addError('Enter a valid numeric value for number of consumers for '
+											+ consumerType);
+									return false;
+								}
+								consumerTypes += consumerType + '-';
+								consumerCounts += consumerCount + '-';
+							}
+						}
+					}
+					removeMessage();
+					if (consumerTypes == '' || consumerCounts == '') {
+						addError('Invalid register consumer request!');
+						return false;
+					}
+					register(consumerTypes, consumerCounts, url, groupId);
+				});
+
+$("#unregister-submit").click(function() {
+	var url = $('#unregisterUrl option:selected').attr('type');
+	var groupId = $('#unregisterUrl option:selected').attr('groupId');
+	var consumerType = $('#unregisterQueueType option:selected').attr('type');
+	removeMessage();
+	unregisterByType(consumerType, url, groupId);
+});
+
+$("#status-submit").click(function() {
+	var url = $('#statusUrl option:selected').attr('type');
+	var groupId = $('#statusUrl option:selected').attr('groupId');
+	var consumerType = $('#statusQueueType option:selected').attr('type');
+	removeMessage();
+	consumerStatus(consumerType, url, groupId);
+});
+
+$("#manual-submit").click(function() {
+	var url = $('#manualUrl option:selected').attr('type');
+	var consumerType = $('#manualQueueType option:selected').attr('type');
+	var id = $('#manualId').val();
+	if (consumerType != "supcListener" && isNaN(parseInt(id))) {
+		addError('Enter a valid numeric value for id');
+		return false;
+	}
+	removeMessage();
+	index(consumerType, id, url);
+});
+
+$("#flush-submit").click(function() {
+	var url = $('#flushUrl option:selected').attr('type');
+	var consumerType = $('#flushQueueType option:selected').attr('type');
+	removeMessage();
+	flush(consumerType, url);
+});
+
+$("#kafka-status-check").click(function() {
+	var groupid = $('#kafkaGroupSelectID option:selected').val();
+	var topic = $('#kafkaTopicSelectID option:selected').val();
+	removeMessage();
+	kafkaCurrentStatus(groupid,topic);
+});
+
+$("#kafka-latest-offset").click(function() {
+	var groupid = $('#kafkaGroupSelectID option:selected').val();
+	var topic = $('#kafkaTopicSelectID option:selected').val();
+	removeMessage();
+	kafkaLatestOffset(groupid,topic);
+});
+
+$("#cache-reload-submit").click(function() {
+	var url = $('#cacheUrl option:selected').attr('type');
+	removeMessage();
+	reloadCache(url);
+});
+
+$("#metadatacache-reload-submit").click(function() {
+	var url = $('#metadataCacheUrl option:selected').attr('type');
+	removeMessage();
+	reloadMetadataCache(url);
+});

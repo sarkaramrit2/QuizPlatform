@@ -1,0 +1,168 @@
+$("#simulate-button").click(function() {
+	var masterSolr1 = $('#simulateMasterSolr1 option:selected').attr('value');
+	var masterSolr2 = $('#simulateMasterSolr2 option:selected').attr('value');
+	$('#containment-wrapper').hide();
+	$('#submit-div').hide();
+	if (masterSolr1 == 0 || masterSolr2 == 0) {
+		addError("Please select the masters appropriately!");
+	} else if (masterSolr1 == masterSolr2) {
+		addError("Nothing to simulate, masters selected are same!");
+	} else {
+		simulate(masterSolr1, masterSolr2);
+	}
+});
+
+$("#submit-button").click(function() {
+	var masterSolr1 = $('#simulateMasterSolr1 option:selected').attr('value');
+	var masterSolr2 = $('#simulateMasterSolr2 option:selected').attr('value');
+	var nodes1 = masterSolr1 + ",";
+	$('#draggable-' + masterSolr1).children("span").each(function() {
+		nodes1 += $(this).attr('id') + ',';
+	});
+	var nodes2 = masterSolr2 + ",";
+	$('#draggable-' + masterSolr2).children("span").each(function() {
+		nodes2 += $(this).attr('id') + ',';
+	});
+	submitSimulation(nodes1, nodes2);
+});
+
+function submitSimulation(nodes1, nodes2) {
+	var ajaxUrl = "/admin/simulation/submit?node1=" + nodes1 + "&node2="
+			+ nodes2;
+	$.ajax({
+		url : ajaxUrl,
+		type : "GET",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+
+function adjustCount1(masterSolr1, masterSolr2, count) {
+	var node1 = $('#simulateMasterSolr1 option:selected').html();
+	var node2 = $('#simulateMasterSolr2 option:selected').html();
+	var count1 = $('#node-' + masterSolr1).html().split("(")[1].split(")")[0];
+	var count2 = $('#node-' + masterSolr2).html().split("(")[1].split(")")[0];
+	var count1 = parseInt(count1) + parseInt(count);
+	var count2 = parseInt(count2) - parseInt(count);
+	$('#node-' + masterSolr1).html(node1 + "(" + count1 + ")");
+	$('#node-' + masterSolr2).html(node2 + "(" + count2 + ")");
+}
+
+function adjustCount2(masterSolr1, masterSolr2, count) {
+	var node1 = $('#simulateMasterSolr1 option:selected').html();
+	var node2 = $('#simulateMasterSolr2 option:selected').html();
+	var count1 = $('#node-' + masterSolr1).html().split("(")[1].split(")")[0];
+	var count2 = $('#node-' + masterSolr2).html().split("(")[1].split(")")[0];
+	var count1 = parseInt(count1) - parseInt(count);
+	var count2 = parseInt(count2) + parseInt(count);
+	$('#node-' + masterSolr1).html(node1 + "(" + count1 + ")");
+	$('#node-' + masterSolr2).html(node2 + "(" + count2 + ")");
+}
+
+function simulate(masterSolr1, masterSolr2) {
+	var ajaxUrl = "/admin/simulation/do?masterNode1=" + masterSolr1
+			+ "&masterNode2=" + masterSolr2;
+	$
+			.ajax({
+				url : ajaxUrl,
+				type : "GET",
+				dataType : 'json',
+				success : function(data) {
+					var status = data['status'];
+					var msg = data['message'];
+					if (status == "success") {
+						html = '';
+						var item1 = fixArray(data.items[masterSolr1]);
+						var item2 = fixArray(data.items[masterSolr2]);
+						var node1 = $('#simulateMasterSolr1 option:selected')
+								.html();
+						var node2 = $('#simulateMasterSolr2 option:selected')
+								.html();
+						html += "<div id=\"draggable-" + masterSolr1
+								+ "\" class=\"draggable ui-widget-content\">";
+						html += "<p id=\"node-" + masterSolr1 + "\">" + node1
+								+ "(" + data.items["allCount1"] + ")" + "</p>";
+						for ( var i = 0; i < item1.length; i++) {
+							html += "<span id=\"category-" + item1[i].id
+									+ "\">" + item1[i].name + "("
+									+ item1[i].count + ")</span>";
+						}
+						html += "</div>";
+						html += "<div id=\"draggable-" + masterSolr2
+								+ "\" class=\"draggable ui-widget-content\">";
+						html += "<p id=\"node-" + masterSolr2 + "\">" + node2
+								+ "(" + data.items["allCount2"] + ")" + "</p>";
+						for ( var i = 0; i < item2.length; i++) {
+							html += "<span id=\"category-" + item2[i].id
+									+ "\">" + item2[i].name + "("
+									+ item2[i].count + ")</span>";
+						}
+						html += "</div>";
+						$('#containment-wrapper').html(html);
+						$('#containment-wrapper').show();
+						$('#submit-div').show();
+						applyDragNDrop(masterSolr1, masterSolr2);
+						addSuccessMessage(msg);
+					} else {
+						addError(msg);
+					}
+				}
+			});
+}
+
+function fixArray(array) {
+	if ($.isArray(array)) {
+		return array;
+	} else {
+		return [ array ];
+	}
+}
+
+function applyDragNDrop(masterSolr1, masterSolr2) {
+	var parent = "#containment-wrapper";
+	var div1 = "#draggable-" + masterSolr1;
+	var div2 = "#draggable-" + masterSolr2;
+	var drop1 = div1 + " > span";
+	var drop2 = div2 + " > span";
+	$(parent + " span").draggable({
+		containment : parent,
+		scroll : false,
+		cursor : "move",
+		revert : "invalid",
+		helper : "clone",
+	});
+	$(div1).droppable(
+			{
+				accept : drop2,
+				activeClass : "ui-state-highlight",
+				drop : function(event, ui) {
+					deleteItem(ui.draggable, div1);
+					adjustCount1(masterSolr1, masterSolr2, ui.draggable.html()
+							.split("(")[1].split(")")[0]);
+				}
+			});
+	$(div2).droppable(
+			{
+				accept : drop1,
+				activeClass : "ui-state-highlight",
+				drop : function(event, ui) {
+					deleteItem(ui.draggable, div2);
+					adjustCount2(masterSolr1, masterSolr2, ui.draggable.html()
+							.split("(")[1].split(")")[0]);
+				}
+			});
+};
+
+function deleteItem($item, $trash) {
+	$item.fadeOut(function() {
+		$item.appendTo($trash).fadeIn();
+	});
+};

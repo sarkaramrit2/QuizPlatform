@@ -1,0 +1,54 @@
+package com.quiz.web.controller;
+
+
+
+@Controller
+@RequestMapping("/indexer")
+public class QuesReviewerIndexerController {
+
+    private static final Logger                  LOGGER                  = LoggerFactory.getLogger(QuesMakerIndexerController.class);
+    
+    @Autowired
+    private IQuizIndexerService	quizIndexerService;
+    
+    @RequestMapping("/questionPanel")
+    public String tagAdmin(ModelMap map) {
+        return "indexer/questionPanel"; //jsp of this name
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/questionPanel/getAllUnReviewQues")
+    @GET
+    @ResponseBody
+    public SystemResponse getAllUnReviewQues() {
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+        try {
+            response.addItem("questions", quizIndexerService.getAllUnReviewQues());
+            response.setStatus(SystemResponse.ResponseStatus.SUCCESS.responseType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not retrieve questions from database due to exception " + e.getMessage());
+        }
+        LOGGER.info("Response:: "+response);
+        return response;
+    }
+    
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping("/questionPanel/getAllLiveQues")
+    @GET
+    @ResponseBody
+    public SystemResponse getAllLiveQues() {
+        SystemResponse response = new SystemResponse();
+        response.setStatus(SystemResponse.ResponseStatus.FAIL.responseType());
+        try {
+            response.addItem("questions", quizIndexerService.getAllLiveQues());
+            response.setStatus(SystemResponse.ResponseStatus.SUCCESS.responseType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setMessage("Could not retrieve questions from database due to exception " + e.getMessage());
+        }
+        LOGGER.info("Response:: "+response);
+        return response;
+    }
+}

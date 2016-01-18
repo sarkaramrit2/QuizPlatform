@@ -1,0 +1,92 @@
+/**
+ *  Common Functions : Error Message
+ */
+
+function addError(message) {
+	$("#message").html('<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Error!</h4>'+ message +'</div>');
+}
+
+function addMessage(message) {
+	$("#message").html('<div class="alert alert-info alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Info:</h4>'+ message +'</div>');
+}
+
+function addSuccessMessage(message) {
+	$("#message").html('<div class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><h4>Success!</h4>'+ message +'</div>');
+}
+
+function removeMessage(){
+	$("#message").html('');
+}
+
+function addSuccessValidation(element) {
+	removeValidation(element);
+	element.parent().parent().addClass("has-success has-feedback");
+}
+
+function addErrorValidation(element) {
+	removeValidation(element);
+	element.parent().parent().addClass("has-error has-feedback");
+}
+
+function addWarningValidation(element) {
+	removeValidation(element);
+	element.parent().parent().addClass("has-warning has-feedback");
+}
+
+function removeValidation(element) {
+	element.parent().parent().removeClass("has-warning has-success has-error has-feedback");
+}
+
+function fixArray(data) {
+	if(data != undefined) {
+		if(data.length == undefined) {
+			data.length = 1
+			data[0] = data;
+			return data;
+		}
+	}
+}
+
+function isNumeric(val) {
+    var validChars = '0123456789.';
+    for(var i = 0; i < val.length; i++) {
+        if(validChars.indexOf(val.charAt(i)) == -1)
+            return false;
+    }
+    return true;
+}
+
+function jsonToObj(object) {
+	return JSON && JSON.parse(object) || $.parseJSON(object);
+}
+
+function addSystemResponseData(data) {
+	var status = data['status'];
+	var msg = data['message'];
+	if (status == "success") {
+		resetAll();
+		addSuccessMessage(msg);
+	} else {
+		addError(msg);
+	}
+}
+
+function validateImportantFields(isValid) {
+	$(".important").each(function(){
+		if($(this).val() == undefined || $(this).val() == "") {
+			isValid = false;
+			addErrorValidation($(this));
+			removeMessage();
+			addError("Mandatory Fields are not filled");
+		} else {
+			addSuccessValidation($(this));
+		}
+	});
+	return isValid;
+}
+
+function removeValidationFromImportantFields(isValid) {
+	$(".important").each(function(){
+			removeValidation($(this));
+	});
+}

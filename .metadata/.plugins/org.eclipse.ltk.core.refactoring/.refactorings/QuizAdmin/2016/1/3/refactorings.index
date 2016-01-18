@@ -1,0 +1,15 @@
+1452943028903	Delete element
+1452943275070	Delete element
+1452944172515	Delete element
+1452944471090	Delete element
+1452944619527	Delete element
+1452944751899	Rename type 'QuizIndexerController'
+1452944763182	Rename type 'QuizTakerIndexerController'
+1452944867470	Rename type 'QuizMakerIndexerController'
+1452944878433	Rename type 'QuizReviewerIndexerController'
+1452945856375	Delete element
+1452946947830	Move 'index.jsp' to 'views'
+1452946960243	Move 'index.jsp' to 'WEB-INF'
+1452947118820	Move 'index.jsp' to 'webapp'
+1452955732897	Rename resource 'spring-servlet.xml'
+1452962461763	Delete element

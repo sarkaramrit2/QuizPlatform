@@ -1,0 +1,32 @@
+/* Js Functions of indexer admins 
+ */
+
+function addError(message) {
+	$("#message").html('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Error!</h4>'+ message +'</div>');
+}
+
+function addMessage(message) {
+	$("#message").html('<div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Info:</h4>'+ message +'</div>');
+}
+
+function addSuccessMessage(message) {
+	$("#message").html('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button><h4>Success!</h4>'+ message +'</div>');
+}
+
+function removeMessage(){
+	$("#message").html('');
+}
+
+function readHPSA() {
+	var ajaxUrl = "/admin/hobbit/submit";
+	$.ajax({url:ajaxUrl, type: "GET", dataType: 'json', success: function(data) {
+		var status=data['status'];
+		var msg = data['message'];
+		if(status=="success") {
+			addSuccessMessage(msg);
+		} else {
+			addError(msg);
+		}	
+	}});		
+}
+

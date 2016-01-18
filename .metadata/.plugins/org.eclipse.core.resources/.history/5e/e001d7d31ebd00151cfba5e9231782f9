@@ -1,0 +1,12 @@
+package com.quiz.utils;
+
+public class ObjectToJSON {
+
+	public static void convertObjToJSON(Object obj){
+	
+	ObjectMapper mapper = new ObjectMapper();
+	
+	String jsonInString = mapper.writeValueAsString(obj);
+	
+	}
+}

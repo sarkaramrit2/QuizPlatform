@@ -1,0 +1,366 @@
+//AngularJs handling
+app.controller('manageTagsController', function($scope, ngTableParams, $filter, $modal, ajaxService, modalService) {
+	$scope.initializeController = function () {
+		$scope.tags = {};
+		$scope.tagColumns = [];
+		$scope.overrideTags = {};
+		$scope.overrideTags.tags = [];
+        $scope.columns = [];
+        $scope.editId = -1;
+        $scope.overrideTags.pogId = '';
+        $scope.operations = ['add', 'delete' ];
+        $scope.disableFlag = false;
+        $scope.columns = [
+                          { title: 'Tag Name', field: 'value', visible: true, filter: { value: 'text' }},
+                          { title: 'Boost Value', field: 'boost', visible: true, filter: { boost: 'text' } , type: 'number'},
+                          { title: 'Operation', field: 'operation', visible: true, filter: { operation: 'text' }, type: 'select' },
+                          { title: 'Start Date', field: 'start_date', visible: true, type: 'date' },
+                          { title: 'End Date', field: 'end_date', visible: true, type: 'date' }
+                      ];
+	};
+	
+		$scope.resetPOG = function(){
+			//enable submit button
+			$scope.disableFlag = false;	
+			$scope.tags = {};
+			$scope.overrideTags.tags = [];
+			$scope.tableParams.reload();
+			$scope.overrideTags = {};
+    		$scope._overrideTags = angular.copy($scope.overrideTags);
+		};
+		
+		$scope.indexPOG = function(){
+			var pogObject = new Object();
+			pogObject.pogId = $scope.overrideTags.pogId;
+			pogObject.queueUrl = $scope.queueUrl;
+			var argument = "pogId="+$scope.overrideTags.pogId;
+			/*+"&queueUrl="+$scope.queueUrl;*/
+			ajaxService.AjaxPostWithParam(argument, "/admin/tagAdmin/indexTagPog", $scope.indexPOGSuccess, $scope.indexPOGError);
+		};
+		
+		$scope.indexPOGSuccess = function(){/*nothing to do*/};
+		$scope.indexPOGError = function(){/*nothing to do*/};
+		
+    
+		
+	    $scope.submitPOG = function(){
+	    	//disable submit button
+	    	if(isNaN($scope.overrideTags.pogId) || Number($scope.overrideTags.pogId) <= 0){
+	    		addError("POG ID must be a valid number greater than zero!");return;
+	    	}
+	    	var pogObject = new Object();
+	    	$scope.disableFlag = true;
+	    	pogObject.pogId = $scope.overrideTags.pogId;
+	    	ajaxService.AjaxGetWithData(pogObject, "/admin/tagAdmin/getTagsByPog", $scope.submitPOGSuccess, $scope.submitPOGError);
+	    };
+	    
+	    $scope.submitPOGSuccess = function(response){
+	    	var items = response['items'];
+	    	if(items!=null && items['overrideTags']!=null){
+	    		$scope.overrideTags = items['overrideTags'];
+	    		//alert(JSON.stringify($scope.overrideTags));
+	    		$scope._overrideTags = angular.copy($scope.overrideTags);
+	    		$scope.tableParams.sorting($scope.columns[0].field, 'asc');
+	        	$scope.tableParams.reload(); 
+	    	}else{
+	    		$scope.overrideTags.tags = [];
+	    		$scope._overrideTags = angular.copy($scope.overrideTags);
+	    		$scope.tableParams.reload(); 
+	    		
+	    	}
+	    	if(items!=null && items['tags']!=null){
+	    		$scope.tags = items['tags'].value.tags;
+	    		/*alert(JSON.stringify($scope.tags));*/
+	    		$scope.tagColumns = [
+	                              { title: 'Tag Name', field: 'value', visible: true, filter: { value: 'text' }},
+	                              { title: 'Boost Value', field: 'boost', visible: true, filter: { boost: 'text' } }
+	                          ];
+	    	}else{
+	    		$scope.tags = {};
+	    		/*alert(JSON.stringify($scope.tags));*/
+	    	}
+	    };
+	    
+	    $scope.submitPOGError = function(response){
+	    	//Nothing to do as no exception handling at server side
+	    };
+        
+        var getData = function() {
+        	return $scope.overrideTags.tags;
+        }; 
+        
+        $scope.editTag = function(index){
+        	$scope.editId=index;
+        };
+        
+        var contains = function(tagName, index){
+        	for(var i=0; i< $scope.overrideTags.tags.length; i++){//alert(JSON.stringify($scope.overrideTags.tags)); 
+        		if(index!=i && $scope.overrideTags.tags[i].value == tagName){
+        			return true;
+        		}
+        	}
+        	return false;
+        };
+        
+        $scope.updateTag =  function(row) {
+        	$scope.date = new Date();
+        	if(row.value==undefined || row.value==null || row.value.toString().trim()==''){
+        		addError("Tag name required!");return;
+        	}
+        	if(row.value.toString().trim().length < 2){
+        		addError("Tag name too short!");return;
+        	}
+        	if(row.value.toString().trim().length > 50){
+        		addError("Tag name too large!");return;
+        	}
+        	if(contains(row.value.toString().trim(), $scope.overrideTags.tags.indexOf(row))){
+        		addError("Tag name already exists!");return;
+        	}
+        	if(row.boost==undefined || row.boost==null || row.boost.toString().trim()==''){
+        		addError("Valid boost value required!");return;
+        	}
+        	if(Number(row.boost) < 0 || Number(row.boost) > 9999){
+        		addError("Boost value must be between 0 and 9999!");return;
+        	}
+        	if(isNaN(row.boost)){
+        		addError("Not valid number!");return;
+        	}
+        	if(row.start_date==undefined || row.start_date==null || row.start_date.toString().trim()==''){
+        		addError("Not valid start date!");return;
+        	}
+        	/*if(row.start_date <= new Date()){
+        		addError("Start date can not be past date!");return;
+        	}*/
+        	if(row.end_date==undefined || row.end_date==null || row.end_date.toString().trim()=='' ){
+        		addError("Not valid end date!");return;
+        	}
+        	if(row.end_date <= new Date()){
+        		addError("End date can not be past date!");return;
+        	}
+        	if(row.end_date <= row.start_date){
+        		addError("End date can not be less than start date!");return;
+        	}
+        	$scope.editTag(-1);//now update is going to happen successfully
+        	ajaxService.AjaxPost($scope.overrideTags,"/admin/tagAdmin/addTag", $scope.updateTagCompleted, $scope.updateTagError);
+        };
+        
+        $scope.updateTagError = function (response) {
+        	
+        	angular.copy($scope._overrideTags, $scope.overrideTags);
+        	$scope.tableParams.reload();
+        };
+        
+        $scope.updateTagCompleted = function (response) {
+        	var items = response['items'];
+	    	if(items!=null && items['overrideTags']!=null){
+	    		$scope.overrideTags = items['overrideTags'];
+	    		/*$scope.start_date = new Date ($scope.overrideTags.tags.start_date);
+	    		$scope.end_date = new Date ($scope.overrideTags.tags.end_date);
+	    		$scope.overrideTags.tags.start_date = $scope.start_date;
+	    		$scope.overrideTags.tags.end_date = $scope.end_date;*/
+	    		$scope._overrideTags = angular.copy($scope.overrideTags);
+	    	}else{
+	    		angular.copy($scope._overrideTags, $scope.overrideTags);
+	    	}
+        	$scope.tableParams.reload();
+        };
+        
+        $scope.cancelTag = function(){
+        	angular.copy($scope._overrideTags, $scope.overrideTags);
+        	$scope.tableParams.reload();
+        };
+        
+        $scope.deleteTag =  function(row) {
+        		var modalOptions = {
+                    closeButtonText: 'Cancel',
+                    actionButtonText: 'Delete',
+                    headerText: 'Delete Tag',
+                    bodyText: 'Are you sure you want to delete this tag?'
+                };
+
+                modalService.showModal({}, modalOptions).then(function (result) {
+                	var index = $scope.overrideTags.tags.indexOf(row);
+                	if (index >= 0) {
+                		$scope.overrideTags.tags.splice(index, 1);
+                	}
+                	ajaxService.AjaxPost($scope.overrideTags,"/admin/tagAdmin/deleteTag", $scope.deleteTagCompleted, $scope.deleteTagError);
+                });
+        	
+         };
+        
+        $scope.deleteTagError = function (response) {
+        	angular.copy($scope._overrideTags, $scope.overrideTags);
+        	$scope.tableParams.reload();
+        };
+        
+        $scope.deleteTagCompleted = function (response) {
+        	var items = response['items'];
+	    	if(items!=null && items['overrideTags']!=null){
+	    		$scope.overrideTags = items['overrideTags'];
+	    		$scope._overrideTags = angular.copy($scope.overrideTags);
+	    	}else{
+	    		angular.copy($scope._overrideTags, $scope.overrideTags);
+	    	}
+        	$scope.tableParams.reload();
+        };
+
+        
+        $scope.tableParams = new ngTableParams({
+            page: 1,            // show first page
+            count: 10,          // count per page
+        }, {
+            total: function () { return getData().length; }, // length of data
+            getData: function($defer, params) {$scope.editTag(-1);
+            	var filteredData = params.filter() ?
+                        $filter('filter')(getData(), params.filter()) :
+                        	getData();
+                var orderedData = params.sorting() ?
+                        $filter('orderBy')(filteredData, params.orderBy()) :
+                        	filteredData;
+
+                params.total(orderedData.length); // set total for recalc pagination
+                
+                $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+            },
+        }); 
+        $scope.tableParams.settings().$scope = $scope;
+
+       
+        //Add modal
+        
+        $scope.openAddTagModal = function (size) {
+        	/*if($scope.overrideTags.tags.length >= 40){
+        		addError("Adding tags more than 40 is not allowed!");
+        		return;
+        	}*/
+        		
+            var modalInstance = $modal.open({
+              templateUrl: 'addTag.html',
+              controller: addTagController,
+              size: size,
+              resolve: {
+                  operations: function () {
+                      return $scope.operations;
+                    },
+                    overrideTags: function () {
+                        return $scope.overrideTags;
+                      }
+              }
+            });
+            modalInstance.result.then(function (response) {
+            	var items = response['items'];
+    	    	if(items!=null && items['overrideTags']!=null){
+    	    		$scope.overrideTags = items['overrideTags'];
+    	    		$scope._overrideTags = angular.copy($scope.overrideTags);
+    	    	}else{
+    	    		angular.copy($scope._overrideTags, $scope.overrideTags);
+    	    	}
+            	$scope.tableParams.reload();
+              }, function () {
+                //$log.info('Modal dismissed at: ' + new Date());
+              });
+            };
+            
+            
+            var addTagController = function ($scope, $modalInstance, ajaxService, operations, overrideTags) {
+            	$scope.overrideTags = overrideTags;
+            	$scope.overrideTag = {value:'', boost:'', operation: 'add', start_date:'', end_date:''};
+            	$scope.operations = operations;
+                $scope.addTag = function () {
+                	$scope.start_date_error = false;$scope.end_date_error = false;
+                	$scope.value_error = false;
+                	for(var i=0; i< $scope.overrideTags.tags.length; i++){
+                		if($scope.overrideTags.tags[i].value == $scope.overrideTag.value.toString().trim()){
+                			$scope.error = "Tag name already exists!";
+                			$scope.value_error = true; return;
+                		}
+                	}
+                	if($scope.overrideTag.operation=="add"){
+                	if(Number($scope.overrideTag.boost) < 0 || Number($scope.overrideTag.boost) > 9999){
+                		$scope.error = "Boost value must be between 0 and 9999!";
+                		$scope.boost_error = true; return;
+                	}
+                	/*if($scope.overrideTag.start_date <= new Date()){
+                		$scope.error = "Start date can not be past date!";
+                		$scope.start_date_error = true;return;
+                	}*/
+                	if($scope.overrideTag.end_date <= new Date()){
+                		$scope.error = "End date can not be past date!";
+                		$scope.end_date_error = true;return;
+                	}
+                	if($scope.overrideTag.end_date <= $scope.overrideTag.start_date){
+                		$scope.error = "End date can not be less than start date!";
+                		$scope.end_date_error = true;return;
+                	}
+                	}
+                	$scope.overrideTags.tags.push($scope.overrideTag);
+                	//alert(JSON.stringify($scope.overrideTags));
+                	ajaxService.AjaxPost($scope.overrideTags,"/admin/tagAdmin/addTag", $scope.addTagCompleted, $scope.addTagError);
+                };
+                
+                $scope.addTagCompleted = function(response){
+                	$modalInstance.close(response);
+                };
+                
+                $scope.addTagError = function(response){
+                	$modalInstance.close(response);
+                };
+                
+                $scope.closeAddTagModal = function () {
+                	$modalInstance.dismiss('cancel');
+                };
+            };
+            
+// View Tag
+            $scope.openViewTagModal = function (size) {
+                var modalInstance = $modal.open({
+                  templateUrl: 'viewTag.html',
+                  controller: viewTagController,
+                  size: size,
+                  resolve: {
+                	  tagColumns: function () {
+                          return $scope.tagColumns;
+                        },
+                      tags: function () {
+                          return $scope.tags;
+                        }
+                  }
+                });
+                };
+                
+                
+                var viewTagController = function ($scope, $modalInstance, ngTableParams, $filter, tagColumns, tags) {
+                	$scope.tags = tags;
+                	$scope.tagColumns = tagColumns;
+                	
+                	$scope.tableParams = new ngTableParams({
+                        page: 1,            // show first page
+                        count: 5,          // count per page
+                    }, {
+                    	counts: [5, 10, 25, 50],
+                        total: function () { return getTagData().length; }, // length of data
+                        getData: function($defer, params) {
+                        	var filteredData = params.filter() ?
+                                    $filter('filter')(getTagData(), params.filter()) :
+                                    	getTagData();
+                            var orderedData = params.sorting() ?
+                                    $filter('orderBy')(filteredData, params.orderBy()) :
+                                    	filteredData;
+
+                            params.total(orderedData.length); // set total for recalc pagination
+                            
+                            $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+                        },
+                    }); 
+                    $scope.tableParams.settings().$scope = $scope;
+                    
+                    getTagData = function() {
+                    	return $scope.tags;
+                    };
+                    
+                    $scope.closeViewTagModal = function () {
+                    	$modalInstance.dismiss('cancel');
+                    };
+                };
+    
+});

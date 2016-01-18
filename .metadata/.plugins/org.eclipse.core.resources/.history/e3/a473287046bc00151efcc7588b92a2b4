@@ -1,0 +1,60 @@
+
+<table cellpadding="0" cellspacing="0" border="0"
+	class="display dataTable" id="consumerTable">
+	<thead>
+		<tr>
+			<th>S. No.</th>
+			<th>Id</th>
+			<th>Name</th>
+			<th>Url</th>
+			<th>Group id</th>
+			<th>Enabled</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		<c:forEach items="${consumers}" var="consumer" varStatus="ctr">
+			<tr>
+				<td>${ctr.index + 1}</td>
+				<td><input id="id-${consumer.id}" type="text"
+					value="${consumer.id}" disabled style="width: 20px; height: 20px;" />
+				</td>
+				<td><input id="name-${consumer.id}" type="text"
+					value="${consumer.name}" disabled /></td>
+				<td><input id="url-${consumer.id}" type="text"
+					value="${consumer.url}" disabled
+					style="width: 350px; height: 20px;" /></td>
+				<td><input id="group-${consumer.id}" type="text"
+					value="${consumer.group}" disabled
+					style="width: 40px; height: 20px;" /></td>
+				<td><input id="enabled-${consumer.id}" type="text"
+					value="${consumer.enabled}" disabled
+					style="width: 40px; height: 20px;" /></td>
+				<td><input type="button" value="Edit"
+					id="edit-consumer-${consumer.id}"
+					onclick="editConsumer(${consumer.id})"> <input
+					type="button" value="Delete" id="delete-consumer-${consumer.id}"
+					onclick="deleteConsumer(${consumer.id})"> <input
+					type="button" value="Submit" hidden
+					id="submit-consumer-${consumer.id}"
+					onclick="submitConsumer(${consumer.id})"></td>
+			</tr>
+		</c:forEach>
+		<tr>
+			<td>New IC</td>
+			<td><input id="id-new" type="text" value="" disabled
+				style="width: 20px; height: 20px;" /></td>
+			<td><input id="name-new" type="text" value="" disabled /></td>
+			<td><input id="url-new" type="text" value="" disabled
+				style="width: 350px; height: 20px;" /></td>
+			<td><input id="group-new" type="text" value="" disabled
+				style="width: 350px; height: 20px;" /></td>
+			<td><input id="enabled-new" type="text" value="" disabled
+				style="width: 40px; height: 20px;" /></td>
+			<td><input type="button" value="Add New" id="new-consumer"
+				onclick="newConsumer()"> <input type="button" value="Submit"
+				hidden id="submit-consumer" onclick="submitNewConsumer()"></td>
+		</tr>
+	</tbody>
+</table>

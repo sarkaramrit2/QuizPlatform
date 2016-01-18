@@ -1,0 +1,39 @@
+package com.quiz.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ObjectToJSON {
+
+	public static String convertObjToJSON(Object obj) throws JsonProcessingException {
+
+		ObjectMapper mapper = new ObjectMapper();
+		return  mapper.writeValueAsString(obj);
+
+	}
+	
+	public static void main(String[] args) throws JsonProcessingException {
+		List<QuestionDTO> questions=  new ArrayList<QuestionDTO>();
+		List<String> dummy = new ArrayList<String>();
+		dummy.add("123");
+		dummy.add("234");
+		questions.add(new QuestionDTO("abc", dummy));
+		System.out.println(convertObjToJSON(questions));
+		
+	}
+	
+	
+}
+class QuestionDTO{
+	private String abc;
+	private List<String> def;
+	public QuestionDTO(String abc, List<String> def) {
+		super();
+		this.abc = abc;
+		this.def = def;
+	} 
+	
+}

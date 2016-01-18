@@ -1,0 +1,14 @@
+package com.quiz.utils;
+
+import org.apache.http.client.methods.HttpPost;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+
+import com.quiz.enums.SystemProperty;
+
+@SuppressWarnings("deprecation")
+public class SolrUtils {
+	
+	public static HttpPost getHttpPost(SystemProperty property){
+		return new HttpPost(property.getPropertyValue()+"/solr/update/json");
+	}
+}

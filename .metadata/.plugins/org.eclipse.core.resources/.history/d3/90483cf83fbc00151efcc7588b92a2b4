@@ -1,0 +1,188 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.2.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd">
+
+	<!-- Mongo template for indexer 1 -->
+	<mongo:mongo replica-set="#{systemProperties['mongoIndexer1.replicaset']}"
+		id="mongoIndexer1">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" write-fsync="false"
+			write-number="0" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="tagMongo" mongo-ref="mongoIndexer1"
+		id="tagMongoDbFactory1" write-concern="NONE" />
+
+	<bean id="tagMongo1" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="tagMongoDbFactory1" />
+	</bean>
+
+	<mongo:db-factory dbname="tagDTOMongo" mongo-ref="mongoIndexer1"
+		id="tagDTOMongoDbFactory1" />
+
+	<bean id="tagDTOMongo1" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="tagDTOMongoDbFactory1" />
+	</bean>
+
+	<mongo:db-factory dbname="suggestionMongo" mongo-ref="mongoIndexer1"
+		id="suggestionMongoDbFactory1" write-concern="NONE" />
+
+	<bean id="suggestionMongo1" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="suggestionMongoDbFactory1" />
+	</bean>
+
+	<mongo:db-factory dbname="suggestionDTOMongo"
+		mongo-ref="mongoIndexer1" id="suggestionDTOMongoDbFactory1" />
+
+	<bean id="suggestionDTOMongo1" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="suggestionDTOMongoDbFactory1" />
+	</bean>
+
+	<!-- Mongo template for indexer 2 -->
+	<mongo:mongo replica-set="#{systemProperties['mongoIndexer2.replicaset']}"
+		id="mongoIndexer2">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" write-fsync="false"
+			write-number="0" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="tagDTOMongo" mongo-ref="mongoIndexer2"
+		id="tagDTOMongoDbFactory2" />
+
+	<bean id="tagDTOMongo2" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="tagDTOMongoDbFactory2" />
+	</bean>
+	
+	<mongo:db-factory dbname="queryBoostMongo" mongo-ref="mongoIndexer1"
+		id="queryBoostMongoDbFactory1"/>
+
+	<bean id="queryBoostMongo1" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="queryBoostMongoDbFactory1" />
+	</bean>
+
+	<mongo:db-factory dbname="suggestionDTOMongo"
+		mongo-ref="mongoIndexer2" id="suggestionDTOMongoDbFactory2" />
+
+	<bean id="suggestionDTOMongo2" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="suggestionDTOMongoDbFactory2" />
+	</bean>
+
+	<!-- Mongo template for indexer 3 -->
+	<mongo:mongo replica-set="#{systemProperties['mongoIndexer3.replicaset']}"
+		id="mongoIndexer3">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" write-fsync="false"
+			write-number="0" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="tagDTOMongo" mongo-ref="mongoIndexer3"
+		id="tagDTOMongoDbFactory3" />
+
+	<bean id="tagDTOMongo3" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="tagDTOMongoDbFactory3" />
+	</bean>
+
+	<mongo:db-factory dbname="suggestionDTOMongo"
+		mongo-ref="mongoIndexer3" id="suggestionDTOMongoDbFactory3" />
+
+	<bean id="suggestionDTOMongo3" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="suggestionDTOMongoDbFactory3" />
+	</bean>
+
+	<!-- Mongo template for common mongo -->
+	<mongo:mongo replica-set="#{systemProperties['mongoCommon.replicaset']}"
+		id="mongoCommon">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="snapdealdb" mongo-ref="mongoCommon"
+		id="mongoDbFactoryCommon" />
+
+	<bean id="mongoTemplateCommon" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactoryCommon" />
+	</bean>
+
+	<!-- Mongo template for trebuchet mongo -->
+	<mongo:mongo replica-set="#{systemProperties['mongoTrebuchet.replicaset']}"
+		id="mongoTrebuchet">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="snapdealdb" mongo-ref="mongoTrebuchet"
+		id="mongoDbFactoryTrebuchet" />
+
+	<bean id="mongoTemplateTrebuchet" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactoryTrebuchet" />
+	</bean>
+	
+	<!-- Mongo template for trebuchet mongo -->
+	<mongo:mongo replica-set="#{systemProperties['mongoPromo.replicaset']}"
+		id="mongoPromo">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="promo" mongo-ref="mongoPromo"
+		id="mongoDbFactoryPromo" />
+
+	<bean id="mongoTemplatePromo" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactoryPromo" />
+	</bean>
+	
+	
+	<!-- Mongo template for rbf indexer -->
+	<mongo:mongo replica-set="#{systemProperties['mongoRbfIndexer.replicaset']}"
+		id="mongoRbfIndexer">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" write-fsync="false"
+			write-number="0" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="rbfIndexer" mongo-ref="mongoRbfIndexer"
+		id="rbfMongoDbFactory" write-concern="NONE" />
+
+	<bean id="rbfIndexer" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="rbfMongoDbFactory" />
+	</bean>
+	
+	<!-- Mongo template for rbf -->
+	<mongo:mongo replica-set="#{systemProperties['mongoRbfadmin.replicaset']}"
+		id="mongoRbf">
+		<mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" write-fsync="false"
+			write-number="0" />
+	</mongo:mongo>
+
+	<mongo:db-factory dbname="widgetAdmindb" mongo-ref="mongoRbf"
+		id="mongoRbfDbFactory" write-concern="NONE" />
+
+	<bean id="mongoRbfTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoRbfDbFactory" />
+	</bean>
+	
+	<!-- Mongo template for Personalization mongo -->
+	<mongo:mongo id="mongoPersonalization" replica-set="#{systemProperties['mongoPersonalization.replicaset']}" >
+	    <mongo:options auto-connect-retry="true"
+			connections-per-host="40" slave-ok="true" />
+	</mongo:mongo>
+	
+	<mongo:db-factory id="mongoDbFactoryPersona" dbname="searchpersona" mongo-ref="mongoPersonalization" />
+ 
+	<bean id="segmentAffinityMongo" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactoryPersona" />
+	</bean>
+	
+	<!-- To translate any MongoExceptions thrown in @Repository annotated classes -->
+	<context:annotation-config />
+
+</beans>

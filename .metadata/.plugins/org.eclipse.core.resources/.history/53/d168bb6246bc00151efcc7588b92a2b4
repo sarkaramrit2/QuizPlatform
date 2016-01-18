@@ -1,0 +1,13 @@
+<div class = "row">
+	<div class = "grid col-md-8 col-md-offset-4">
+		<div class = "form-group">
+		<jsp:include page="../bootstrap/submitButton.jsp">
+			<jsp:param value="load-more" name="id" />
+			<jsp:param value="Load More" name="text" />
+			<jsp:param value="col-lg-12" name="labelSize" />
+			<jsp:param value="" name="labelSizeOffset" />
+			<jsp:param value="btn btn-primary btn-lg col-lg-12" name="buttonClass" />
+		</jsp:include>				
+		</div>
+	</div>
+</div>

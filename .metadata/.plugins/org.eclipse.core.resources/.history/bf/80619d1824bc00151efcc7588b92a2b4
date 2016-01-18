@@ -1,0 +1,13 @@
+package com.quiz.core.dto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class CategoryDTO {
+	
+	private String catId;
+	private String catName;
+	private String catDesc;
+	private List<CategoryDTO> subCateogies = new ArrayList<CategoryDTO>();
+
+}

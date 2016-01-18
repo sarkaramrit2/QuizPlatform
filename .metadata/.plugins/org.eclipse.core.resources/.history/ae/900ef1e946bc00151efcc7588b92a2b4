@@ -1,0 +1,5 @@
+package com.quiz.web.controller;
+
+public class QuizReviewerIndexerController {
+
+}

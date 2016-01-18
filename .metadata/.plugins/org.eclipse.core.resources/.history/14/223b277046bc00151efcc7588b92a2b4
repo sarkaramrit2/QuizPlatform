@@ -1,0 +1,133 @@
+function editNode(id) {
+	var elementId = "#id-" + id;
+	var elementName = "#name-" + id;
+	var elementMasterIp = "#masterip-" + id;
+	var elementMasterPort = "#masterport-" + id;
+	var elementSlaveIp = "#slaveip-" + id;
+	var elementSlavePort = "#slaveport-" + id;
+	var elementEdit = "#edit-node-update-" + id;
+	var elementSubmit = "#edit-node-submit-" + id;
+
+	$(elementName).removeAttr('disabled');
+	$(elementMasterIp).removeAttr('disabled');
+	$(elementMasterPort).removeAttr('disabled');
+	$(elementSlaveIp).removeAttr('disabled');
+	$(elementSlavePort).removeAttr('disabled');
+	$(elementSubmit).removeAttr('hidden');
+	$(elementEdit).attr('hidden', 'true');
+
+}
+function submitNode(id) {
+	var elementId = "#id-" + id;
+	var elementName = "#name-" + id;
+	var elementMasterIp = "#masterip-" + id;
+	var elementMasterPort = "#masterport-" + id;
+	var elementSlaveIp = "#slaveip-" + id;
+	var elementSlavePort = "#slaveport-" + id;
+	var elementEdit = "#edit-node-update-" + id;
+	var elementSubmit = "#edit-node-submit-" + id;
+
+	if ($(elementName).val() != '' && $(elementMasterIp).val() != ''
+			&& $(elementMasterPort).val() != ''
+			&& $(elementSlaveIp).val() != '' && $(elementSlavePort).val() != ''
+			&& (/^\d+$/.test($(elementMasterPort).val()))
+			&& (/^\d+$/.test($(elementSlavePort).val()))) {
+
+		$(elementName).attr('disabled', 'true');
+		$(elementMasterIp).attr('disabled', 'true');
+		$(elementMasterPort).attr('disabled', 'true');
+		$(elementSlaveIp).attr('disabled', 'true');
+		$(elementSlavePort).attr('disabled', 'true');
+		$(elementEdit).removeAttr('hidden');
+		$(elementSubmit).attr('hidden', 'true');
+
+		var ajaxUrl = "/admin/search/update?nodeId="
+				+ $(elementId).val() + "&name=" + $(elementName).val()
+				+ "&masterSolrIp=" + $(elementMasterIp).val()
+				+ "&masterSolrPort=" + $(elementMasterPort).val()
+				+ "&slaveElbIp=" + $(elementSlaveIp).val() + "&slaveElbPort="
+				+ $(elementSlavePort).val();
+		$.ajax({
+			url : ajaxUrl,
+			dataType : 'json',
+			success : function(data) {
+				var status = data['status'];
+				var msg = data['message'];
+				if (status == "success") {
+					addSuccessMessage(msg);
+				} else {
+					addError(msg);
+				}
+
+			}
+		});
+	} else {
+		if ($(elementName).val() == "") {
+			addError('Name should not be Empty');
+			return false;
+		}
+
+		if ($(elementMasterIp).val() == "") {
+			addError('MasterIp should not be Empty');
+			return false;
+		}
+		if (isNaN(parseInt($(elementMasterPort).val()))) {
+			addError('Enter a valid numeric value for MasterPort');
+			return false;
+		}
+		if ($(elementSlaveIp).val() == "") {
+			addError('SlaveIp should not be Empty');
+			return false;
+		}
+
+		if (isNaN(parseInt($(elementSlavePort).val()))) {
+			addError('Enter a valid numeric value for SlavePort');
+			return false;
+		}
+	}
+}
+
+function deleteNode(id) {
+	var ajaxUrl = "/admin/search/delete?id=" + id;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+		}
+	});
+}
+function addNode(name, masterSolrIp, masterSolrPort, type, capacity,
+		loadFactor, optimalLoadFactor, approxCurrentCount, slaveElbIp,
+		slaveElbPort) {
+	var ajaxUrl = "/admin/search/add?name=" + name + "&masterSolrIp="
+			+ masterSolrIp + "&masterSolrPort=" + masterSolrPort + "&type="
+			+ type + "&capacity=" + capacity + "&loadFactor=" + loadFactor
+			+ "&optimalLoadFactor=" + optimalLoadFactor
+			+ "&approxCurrentCount=" + approxCurrentCount + "&slaveElbIp="
+			+ slaveElbIp + "&slaveElbPort=" + slaveElbPort;
+
+	$.ajax({
+		url : ajaxUrl,
+		type : "POST",
+		dataType : 'json',
+		success : function(data) {
+			var status = data['status'];
+			var msg = data['message'];
+			if (status == "success") {
+				addSuccessMessage(msg);
+			} else {
+				addError(msg);
+			}
+
+		}
+	});
+}

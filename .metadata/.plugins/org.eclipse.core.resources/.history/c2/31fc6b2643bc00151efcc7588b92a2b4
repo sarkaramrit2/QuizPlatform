@@ -1,0 +1,92 @@
+var campaignId = '';
+$('#addQuery').hide();
+$('#campaign-search').typeahead([ 
+	{
+		valueKey : 'name',
+		local : campaigns,
+		template : [ '<p class="name">{{name}}</p>', ].join(''),
+		highlight : true,
+		engine : Hogan
+	} 
+]);
+
+function enableQuerySearch() {
+	$('#query-search').typeahead([ 
+	{
+		valueKey : 'name',
+		local : queries,
+		template : [ '<p class="name">{{name}}</p>', ].join(''),
+		highlight : true,
+		limit: typeaheadLimit,
+		engine : Hogan
+	} 
+	]);
+}
+
+function disableQuerySearch() {
+	$('#query-search').typeahead('destroy');
+}
+
+function addCampaign(campaign) {
+	if($("#campaigns").html() == undefined || $("#campaigns").html() == "") {
+		campaignId = campaign.id;
+		$('#campaigns').append('<div id="campaign-' + campaign.id + '" campaignId="' + campaign.id + '" class="form-group campaignSelect"><h2><span class="label label-primary">' + campaign.name + 
+				'</span><button type="button" class="close" aria-hidden="true" onclick=removeCampaign("' + campaign.id + '")>&times;</button></h2></div>');
+		setQueries();
+		$('#addQuery').show();
+	}
+}
+
+function setQueries() {
+	var ajaxUrl = '/admin/landingPage/getAllQueriesByCampaignId?campaignId=' + campaignId;
+	$.ajax({url:ajaxUrl, type: "GET", dataType: 'json', success: function(data) {
+		for ( i in data) {
+			addQuery(data[i]);
+		}
+	}});	
+}
+
+function addQuery(query) {
+	if($("#query-" + query.id).html() == undefined ||  $("#query-" + query.id).html() == "") {
+		$('#queries').append('<div id="query-' + query.id + '" queryId="' + query.id + '" class="querySelect"><h3><span class="label label-default"><span class="glyphicon glyphicon-chevron-right"></span> '
+				+ query.name + '</span><button type="button" class="close" aria-hidden="true" onclick=removeQuery("' + query.id + '")>&times;</button></h3></div>');
+	}
+}
+
+function removeCampaign(campaignId) {
+	resetAll();
+}
+
+function resetAll() {
+	campaignId = '';
+	$("#campaigns").html("");
+	$("#queries").html("");
+	$("#campaign-search").val("");
+	$('#addQuery').hide();
+}
+
+function removeQuery(queryId) {
+	$("#query-" + queryId).remove();
+}
+
+
+// It is executed once the user presses the tab button
+$('#query-search').on('typeahead:autocompleted', function(object, datum) {
+	addQuery(datum);
+});
+
+// Works if the user has selected the option
+$('#query-search').on('typeahead:selected', function(object, datum) {
+	addQuery(datum);
+});
+
+$('#campaign-search').on('typeahead:autocompleted', function(object, datum) {
+	addCampaign(datum);
+	enableQuerySearch();
+});
+
+// Works if the user has selected the option
+$('#campaign-search').on('typeahead:selected', function(object, datum) {
+	addCampaign(datum);
+	enableQuerySearch();
+});
