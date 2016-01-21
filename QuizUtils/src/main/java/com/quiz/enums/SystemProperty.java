@@ -1,0 +1,24 @@
+package com.quiz.enums;
+
+public enum SystemProperty {
+
+	SOLR_CLOUD_SERVER("solr.server.url","localhost:2181"),
+	SOLR_MASTER_SERVER("solr.server.url","http://localhost:8983/solr");
+	
+	private String name;
+	private String value;
+	
+	private SystemProperty(String name, String value){  
+		this.name = name;
+		this.value=value;  
+	}
+	
+	public String getPropertyValue(){
+		return this.value;
+	}
+	
+	public String getPropertyName(){
+		return this.name;
+	}
+	
+}
