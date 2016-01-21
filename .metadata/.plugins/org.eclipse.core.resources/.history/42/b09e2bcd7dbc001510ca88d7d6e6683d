@@ -1,5 +1,0 @@
-package com.quiz.search;
-
-public interface IQuizSearch {
-
-}

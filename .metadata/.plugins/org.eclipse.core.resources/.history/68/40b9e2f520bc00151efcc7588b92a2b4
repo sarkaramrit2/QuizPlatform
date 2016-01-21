@@ -1,7 +1,0 @@
-package com.quiz.core.dto;
-
-public class AnswerDTO {
-
-	private String answerOption;
-	private boolean isAnswer;
-}

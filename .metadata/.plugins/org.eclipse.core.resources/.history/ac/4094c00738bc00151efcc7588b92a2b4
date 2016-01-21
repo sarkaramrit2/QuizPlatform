@@ -1,7 +1,0 @@
-package com.quiz.indexer.questions;
-
-public interface IQuestionService {
-
-	public List<QuestionDTO> getQuesByUserId(String userId);
-}
-

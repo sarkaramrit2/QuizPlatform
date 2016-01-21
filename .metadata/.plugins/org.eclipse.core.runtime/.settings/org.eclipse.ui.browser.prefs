@@ -1,4 +1,0 @@
-browser-choice=1
-browsers=<?xml version\="1.0" encoding\="UTF-8"?>\n<web-browsers current\="0">\n<system/>\n<external location\="/usr/bin/firefox" name\="Firefox"/>\n</web-browsers>
-eclipse.preferences.version=1
-internalWebBrowserHistory=http\://localhost\:8085/QuizAdmin/|*|http\://localhost\:8085/|*|http\://localhost\:8080/QuizAdmin/|*|http\://localhost\:8080/QuizAdmin/WEB-INF/|*|

@@ -1,8 +1,0 @@
-/* All the validations of forms happen here 
- * Functions called in this js are include hpsa-admin-functions.js 
- */
-
-$("#read-hpsa-score-file-submit").click(function() {
-	removeMessage();
-	readHPSA();
-});

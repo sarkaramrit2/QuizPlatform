@@ -1,8 +1,0 @@
-<div class="form-group">
-	<div class="${param['labelSize']} ${param['labelSizeOffset']}">
-		<div class="checkbox">
-			<label class="control-label"> <input type="checkbox" class="${param['inputClass']}"
-				id="${param['id']}">${param['text']}</label>
-		</div>
-	</div>
-</div>

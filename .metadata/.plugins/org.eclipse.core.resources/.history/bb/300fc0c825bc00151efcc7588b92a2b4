@@ -1,9 +1,0 @@
-package com.quiz.core.dto;
-
-public class FeedbackDTO {
-
-	private String feebbackId;
-	private String submittedBy;
-	private String email;
-	private String feedback;
-}

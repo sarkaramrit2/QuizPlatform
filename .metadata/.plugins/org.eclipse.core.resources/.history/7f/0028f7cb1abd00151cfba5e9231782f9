@@ -1,7 +1,0 @@
-package com.quiz.utils;
-
-public enum SystemProperty {
-
-	SOLR_SERVER("solr.server.url","http://localhost:8983/solr");
-	
-}

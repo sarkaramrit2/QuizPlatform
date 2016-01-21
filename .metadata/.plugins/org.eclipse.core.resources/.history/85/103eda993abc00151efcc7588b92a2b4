@@ -1,6 +1,0 @@
-searchindexer.maxTotalConnections=200
-searchindexer.defaultMaxPerRoute=200
-searchindexer.soTimeout=60000
-searchindexer.protocol=pbuf
-searchindexer.keepAlive=5000
-searchindexer.idleConnectionMonitorOn=true

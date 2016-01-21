@@ -1,7 +1,0 @@
-<div class="form-group">
-	<label class="control-label ${param['labelSize']}" for="${param['id']}">${param['text']}</label>
-	<div class="${param['size']}">
-		<input class="form-control 	${param['inputClass']}" id="${param['id']}" type="text">
-	</div>
-	<span class="form-control-feedback"></span>
-</div>

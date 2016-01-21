@@ -1,9 +1,0 @@
-package com.quiz.core.dto;
-
-public class ContactUsDTO {
-	
-	private String name;
-	private String email;
-	private String phoneNo;
-	private String matterToDiscuss;
-}

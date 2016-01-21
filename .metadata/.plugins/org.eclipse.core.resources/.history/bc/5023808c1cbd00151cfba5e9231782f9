@@ -1,7 +1,0 @@
-package com.quiz.indexer.questions;
-
-public interface IQuestionSolrIndexer {
-
-	private void indexQuesInSolr(List<QuestionDTO> questions);
-	
-}

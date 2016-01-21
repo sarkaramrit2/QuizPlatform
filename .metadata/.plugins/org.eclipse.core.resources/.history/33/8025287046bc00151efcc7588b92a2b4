@@ -1,3 +1,0 @@
-<div class="${param.labelSize} ${param.labelSizeOffset}">
-	<button class="${param['buttonClass']}" type="button" id="${param.id}">${param.text}</button>
-</div>

@@ -1,9 +1,0 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
-<c:forEach var="ic" items="${consumers}">
-	<c:if test="${ic.enabled}">
-		<option type="${ic.url}" groupId="${ic.group}">
-			<c:out value="${ic.name}" />
-		</option>
-	</c:if>
-</c:forEach>

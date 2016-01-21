@@ -1,7 +1,0 @@
-.row:not (:first-child ){
-	margin-bottom: 5px;
-}
-
-.field {
-	font-weight: bold;
-}
